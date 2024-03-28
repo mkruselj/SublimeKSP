@@ -43,26 +43,33 @@ def parse_node_macros(code_lines, define_cache):
     for name in node_names:
         node_cb[name] = defaultdict(list)
 
+    pruned_node_code = deque()
     for line_obj in code_lines:
         line = line_obj.command.lstrip()
-
+        
         if line.startswith("macro Node."):
             parts = line.split(".")
             current_node = ".".join(parts[1:-1])
             current_callback = parts[-1].split("(")[0]
         elif line.startswith("end macro"):
+            if not current_node:
+                pruned_node_code.append(line_obj)
+            
             current_node = None
             current_callback = None
         else:
-            if current_node and current_callback:
+            if current_node and current_callback and current_node in node_order:
                 if line.startswith('message('):
                     line_obj.command = line_obj.command.replace('message(', 'message("[ {} | {} ]" & '.format(current_node, current_callback))
                 node_cb[current_node][current_callback].append(line_obj)
+            else:
+                if not current_node:
+                    pruned_node_code.append(line_obj)
 
     from ksp_compiler import Line
     pre_assembly_lines = deque()
     voiced_nodes = []
-    for line_obj in code_lines:
+    for line_obj in pruned_node_code:
         line = line_obj.command.lstrip()
         if line.startswith('ivls.AddNodeCallback'):
             pass
