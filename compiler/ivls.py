@@ -89,7 +89,7 @@ def parse_node_macros(code_lines, define_cache):
                     for cb_l in new_func_str.split('\n'):
                         pre_assembly_lines.append(Line(cb_l, None, None))
 
-        elif line.startswith("literate_macro(ivls.voice_logic_select"):
+        elif line.startswith("literate_macro(ivls.voice_logic_select)"):
             for n in voiced_nodes:
                 new_case = voice_logic_case.format(n)
                 for cb_l in new_case.split('\n'):
