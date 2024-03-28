@@ -2090,16 +2090,15 @@ class KSPCompiler(object):
 
     def expand_macros(self):
         from preprocessor_plugins import macro_iter_functions, post_macro_iter_functions, substituteDefines
-        with open('G:\Dropbox\Work\Impact Soundworks\Repositories\_IVLS\ivls_out.txt', 'w') as f:
-            self.lines = expand_macros(f, self.lines, self.macros, 0, True, self.define_cache)
+        self.lines = expand_macros(f, self.lines, self.macros, 0, True, self.define_cache)
 
-            convert_strings_to_placeholders(self.lines)
-            while macro_iter_functions(self.lines, placeholders):
-                self.lines = expand_macros(f, self.lines, self.macros, 0, True, self.define_cache)
-            
-            convert_strings_to_placeholders(self.lines)
-            while post_macro_iter_functions(self.lines, placeholders):
-                self.lines = expand_macros(f, self.lines, self.macros, 0, True, self.define_cache)
+        convert_strings_to_placeholders(self.lines)
+        while macro_iter_functions(self.lines, placeholders):
+            self.lines = expand_macros(f, self.lines, self.macros, 0, True, self.define_cache)
+        
+        convert_strings_to_placeholders(self.lines)
+        while post_macro_iter_functions(self.lines, placeholders):
+            self.lines = expand_macros(f, self.lines, self.macros, 0, True, self.define_cache)
                 
         
     def examine_pragmas(self, code, namespaces):
