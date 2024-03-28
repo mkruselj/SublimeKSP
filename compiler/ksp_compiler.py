@@ -621,17 +621,16 @@ def extract_callback_lines(lines):
 
     return (normal_lines, callback_lines)
 
-
-def expand_macros(lines, macros, level = 0, replace_raw = True):
+def expand_macros(f, lines, macros, level = 0, replace_raw = True, define_cache = None):
     '''Inline macro invocations by the body of the macro definition (with parameters properly replaced)
         returns tuple (normal_lines, callback_lines) where the latter are callbacks'''
+
     macro_call_re = re.compile(r'(?ms)^\s*([\w_.]+)\s*(\(.*\))?%s$' % white_space_re)
     name2macro = {}
 
     for m in macros:
         m.name = m.get_name_prefixed_by_namespace()
         name = m.get_overloaded_name()
-
         if not (name == 'tcm.init' and name in name2macro):
             name2macro[name] = m
 
@@ -657,7 +656,6 @@ def expand_macros(lines, macros, level = 0, replace_raw = True):
 
             if macro_name in name2macro:
                 new_lines.pop()
-
                 macro = name2macro[macro_name]
 
                 if args:
@@ -666,6 +664,7 @@ def expand_macros(lines, macros, level = 0, replace_raw = True):
                     args = []
 
                 # verify that the parameter count is correct
+
                 if len(macro.parameters) != len(args):
                     raise ParseException(line, "Wrong number of parameters for %s()! Expected %d, got %d." % (macro_name, len(macro.parameters), len(args)))
 
@@ -674,7 +673,6 @@ def expand_macros(lines, macros, level = 0, replace_raw = True):
 
                 # build a substitution mapping parameters to arguments, and substitute
                 name_subst_dict = dict(list(zip(macro.parameters, args)))
-
                 macro = macro.copy(add_location = line.locations[0])
                 macro = macro.substitute_names(replace_raw, name_subst_dict)
 
@@ -687,15 +685,29 @@ def expand_macros(lines, macros, level = 0, replace_raw = True):
                 # erase any inner comments to not disturb outer
                 macro_call_str = re.sub(white_space, '', macro_call_str)
                 normal_lines, callback_lines = extract_callback_lines(macro.lines[1:-1])
-                new_lines.extend(normal_lines)
-                new_callback_lines.extend(callback_lines)
+                
+                contents = normal_lines + callback_lines
+                
+                from preprocessor_plugins import macro_iter_functions, post_macro_iter_functions, substituteDefines
+                convert_strings_to_placeholders(contents)
+                substituteDefines(contents, define_cache)
+            
+                while macro_iter_functions(contents, placeholders):
+                    convert_strings_to_placeholders(contents)
+                    substituteDefines(contents, define_cache)
+                    
+                while post_macro_iter_functions(contents, placeholders):
+                    convert_strings_to_placeholders(contents)
+                    substituteDefines(contents, define_cache)
 
+                new_lines.extend(contents)
+                
                 num_substitutions += 1
-
+                
     if num_substitutions:
-        return expand_macros(new_lines + new_callback_lines, macros, level+1, replace_raw)
+        return expand_macros(f, new_lines, macros, level+1, replace_raw, define_cache)
     else:
-        return (new_lines, new_callback_lines)
+        return (new_lines)
 
 class ASTModifierBase(ksp_ast_processing.ASTModifier):
     '''Class for accessing AST nodes for modification'''
@@ -2068,43 +2080,28 @@ class KSPCompiler(object):
 
         handleSanitizeExitCommand(self.lines)
 
+    def ivls_node_assemble(self):
+        from ivls import ivls_node_assemble
+        self.lines = ivls_node_assemble(self.lines, self.define_cache)
+
     def extract_macros(self):
         '''Isolate macros into objects, removing from code'''
         self.lines, self.macros = extract_macros(self.lines)
 
     def expand_macros(self):
         from preprocessor_plugins import macro_iter_functions, post_macro_iter_functions, substituteDefines
+        with open('G:\Dropbox\Work\Impact Soundworks\Repositories\_IVLS\ivls_out.txt', 'w') as f:
+            self.lines = expand_macros(f, self.lines, self.macros, 0, True, self.define_cache)
 
-        # initial expansion. Macro strings are expanded
-        normal_lines, callback_lines = expand_macros(self.lines, self.macros, 0, True)
-        self.lines = normal_lines + callback_lines
-
-        # convert any strings from the macro expansion back into placeholders to prevent defines with identical names within strings being replaced
-        convert_strings_to_placeholders(self.lines)
-
-
-        # nested expansion, supports now using macros to further specify define constants used for iterate and literate macros
-        while macro_iter_functions(self.lines, placeholders):
-            normal_lines, callback_lines = expand_macros(self.lines, self.macros, 0, True)
-            self.lines = normal_lines + callback_lines
-
-        # convert any strings from the macro expansion back into placeholders to allow iter_macros to substitute strings
-        convert_strings_to_placeholders(self.lines)
-
-        # run define subs a second time, catch returned cache just as a formality
-        self.define_cache = substituteDefines(self.lines, self.define_cache)
-
-        while post_macro_iter_functions(self.lines, placeholders):
-            normal_lines, callback_lines = expand_macros(self.lines, self.macros, 0, True)
-            self.lines = normal_lines + callback_lines
-
-        # convert any strings from the macro expansion back into placeholders to allow iter_macros to substitute strings
-        convert_strings_to_placeholders(self.lines)
-
-        # run define subs a final time, catch returned cache just as a formality
-        self.define_cache = substituteDefines(self.lines, self.define_cache)
-
-
+            convert_strings_to_placeholders(self.lines)
+            while macro_iter_functions(self.lines, placeholders):
+                self.lines = expand_macros(f, self.lines, self.macros, 0, True, self.define_cache)
+            
+            convert_strings_to_placeholders(self.lines)
+            while post_macro_iter_functions(self.lines, placeholders):
+                self.lines = expand_macros(f, self.lines, self.macros, 0, True, self.define_cache)
+                
+        
     def examine_pragmas(self, code, namespaces):
         '''Examine pragmas within code'''
 
@@ -2299,8 +2296,8 @@ class KSPCompiler(object):
             #      description                        function                                                                           condition     time-weight
             tasks = [
                  ('processing extensions',            lambda: self.extensions_with_macros(),                                             True,                   1),
-
                  ('pre-macro processes',              lambda: self.run_pre_macro_functions(),                                            True,                   1),
+                 ('ivls node assembly',               lambda: self.ivls_node_assemble(),                                                 True,                   1),
 
                  ('parsing macros',                   lambda: self.extract_macros(),                                                     True,                   1),
                  ('expanding macros',                 lambda: self.expand_macros(),                                                      True,                   1),
