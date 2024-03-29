@@ -705,7 +705,7 @@ def expand_macros(lines, macros, level = 0, replace_raw = True, define_cache = N
                 num_substitutions += 1
                 
     if num_substitutions:
-        return expand_macros(f, new_lines, macros, level+1, replace_raw, define_cache)
+        return expand_macros(new_lines, macros, level+1, replace_raw, define_cache)
     else:
         return (new_lines)
 
