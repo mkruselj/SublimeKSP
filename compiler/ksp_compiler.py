@@ -621,7 +621,7 @@ def extract_callback_lines(lines):
 
     return (normal_lines, callback_lines)
 
-def expand_macros(f, lines, macros, level = 0, replace_raw = True, define_cache = None):
+def expand_macros(lines, macros, level = 0, replace_raw = True, define_cache = None):
     '''Inline macro invocations by the body of the macro definition (with parameters properly replaced)
         returns tuple (normal_lines, callback_lines) where the latter are callbacks'''
 
@@ -2090,15 +2090,15 @@ class KSPCompiler(object):
 
     def expand_macros(self):
         from preprocessor_plugins import macro_iter_functions, post_macro_iter_functions, substituteDefines
-        self.lines = expand_macros(f, self.lines, self.macros, 0, True, self.define_cache)
+        self.lines = expand_macros(self.lines, self.macros, 0, True, self.define_cache)
 
         convert_strings_to_placeholders(self.lines)
         while macro_iter_functions(self.lines, placeholders):
-            self.lines = expand_macros(f, self.lines, self.macros, 0, True, self.define_cache)
+            self.lines = expand_macros(self.lines, self.macros, 0, True, self.define_cache)
         
         convert_strings_to_placeholders(self.lines)
         while post_macro_iter_functions(self.lines, placeholders):
-            self.lines = expand_macros(f, self.lines, self.macros, 0, True, self.define_cache)
+            self.lines = expand_macros(self.lines, self.macros, 0, True, self.define_cache)
                 
         
     def examine_pragmas(self, code, namespaces):
