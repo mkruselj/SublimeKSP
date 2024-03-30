@@ -28,6 +28,8 @@ node_ui_switcher = '''
 '''
 
 def parse_node_macros(code_lines, define_cache):
+    from ksp_compiler import Line
+
     node_cb = OrderedDict()
 
     current_node = None
@@ -43,6 +45,7 @@ def parse_node_macros(code_lines, define_cache):
     for name in node_names:
         node_cb[name] = defaultdict(list)
 
+    # Extract the node callbacks
     pruned_node_code = deque()
     for line_obj in code_lines:
         line = line_obj.command.lstrip()
@@ -60,27 +63,25 @@ def parse_node_macros(code_lines, define_cache):
         else:
             if current_node and current_callback and current_node in node_order:
                 if line.startswith('message('):
-                    line_obj.command = line_obj.command.replace('message(', 'message("[ {} | {} ]" & '.format(current_node, current_callback))
+                    line_obj.command = line_obj.command.replace('message(', 'message("[ {} | {} ] " & '.format(current_node, current_callback))
                 node_cb[current_node][current_callback].append(line_obj)
             else:
                 if not current_node:
                     pruned_node_code.append(line_obj)
 
-    from ksp_compiler import Line
+    # Inject Nodes directly in where IVLS commands are found
     pre_assembly_lines = deque()
     voiced_nodes = []
     for line_obj in pruned_node_code:
         line = line_obj.command.lstrip()
-        if line.startswith('ivls.AddNodeCallback'):
-            pass
-        elif line.startswith("ivls.RunNodeCallback"):
+        if line.startswith("__RUN_CB__"):
             cb_name = line.split('(')[1].split(')')[0]
             for node in node_cb:
                 if cb_name in node_cb[node]:
                     for cb_l in node_cb[node][cb_name]:
                         pre_assembly_lines.append(cb_l)
 
-        elif line.startswith("literate_macro(Voice.NodeCB)"):
+        elif line.startswith("__DECLARE_VOICE_LOGIC__"):
             for n in node_cb:
                 note_on_lines = ''
                 note_off_lines = ''
@@ -96,21 +97,21 @@ def parse_node_macros(code_lines, define_cache):
                     for cb_l in new_func_str.split('\n'):
                         pre_assembly_lines.append(Line(cb_l, None, None))
 
-        elif line.startswith("literate_macro(ivls.voice_logic_select)"):
+        elif line.startswith("__SELECT_VOICE_LOGIC__"):
             for n in voiced_nodes:
                 new_case = voice_logic_case.format(n)
                 for cb_l in new_case.split('\n'):
                     pre_assembly_lines.append(Line(cb_l, None, None))
+
         else:
             pre_assembly_lines.append(line_obj)
 
+    # Catch node callback commands which were assembled inward
     post_assembly_lines = deque()
     for line_obj in pre_assembly_lines:
         line = line_obj.command.lstrip()
 
-        if line.startswith('ivls.AddNodeCallback'):
-            pass
-        elif line.startswith("ivls.RunNodeCallback"):
+        if line.startswith("__RUN_CB__"):
             cb_name = line.split('(')[1].split(')')[0]
             for node in node_cb:
                 if cb_name in node_cb[node]:
