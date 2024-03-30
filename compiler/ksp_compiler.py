@@ -2084,6 +2084,10 @@ class KSPCompiler(object):
         from ivls import ivls_node_assemble
         self.lines = ivls_node_assemble(self.lines, self.define_cache)
 
+    def script_injection(self):
+        from ivls import script_injection
+        self.lines = script_injection(self.basedir, self.lines)
+
     def extract_macros(self):
         '''Isolate macros into objects, removing from code'''
         self.lines, self.macros = extract_macros(self.lines)
@@ -2095,12 +2099,11 @@ class KSPCompiler(object):
         convert_strings_to_placeholders(self.lines)
         while macro_iter_functions(self.lines, placeholders):
             self.lines = expand_macros(self.lines, self.macros, 0, True, self.define_cache)
-        
+
         convert_strings_to_placeholders(self.lines)
         while post_macro_iter_functions(self.lines, placeholders):
             self.lines = expand_macros(self.lines, self.macros, 0, True, self.define_cache)
-                
-        
+
     def examine_pragmas(self, code, namespaces):
         '''Examine pragmas within code'''
 
@@ -2305,6 +2308,7 @@ class KSPCompiler(object):
 
                  ('sanitizing exit command',          lambda: self.run_sanitize_exit_command(),                                          do_sanitize_exit,       1),
                  ('replacing string placeholders',    lambda: self.replace_string_placeholders(),                                        True,                   1),
+                 ('injecting custom scripts',         lambda: self.script_injection(),                                                   True,                   1),
                  ('searching for nckp import',        lambda: self.search_for_nckp(),                                                    True,                   1),
                  ('converting lines to code blocks',  lambda: self.convert_lines_to_code(),                                              True,                   1),
 

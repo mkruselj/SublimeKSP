@@ -46,7 +46,7 @@ def parse_node_macros(code_lines, define_cache):
     pruned_node_code = deque()
     for line_obj in code_lines:
         line = line_obj.command.lstrip()
-        
+
         if line.startswith("macro Node."):
             parts = line.split(".")
             current_node = ".".join(parts[1:-1])
@@ -54,7 +54,7 @@ def parse_node_macros(code_lines, define_cache):
         elif line.startswith("end macro"):
             if not current_node:
                 pruned_node_code.append(line_obj)
-            
+
             current_node = None
             current_callback = None
         else:
@@ -84,12 +84,12 @@ def parse_node_macros(code_lines, define_cache):
             for n in node_cb:
                 note_on_lines = ''
                 note_off_lines = ''
-                
+
                 if 'NoteOn' in node_cb[n]:
                     note_on_lines = '\n'.join([l.command for l in node_cb[n]['NoteOn']])
                 if 'NoteOff' in node_cb[n]:
                     note_off_lines = '\n'.join([l.command for l in node_cb[n]['NoteOff']])
-                
+
                 if not (note_on_lines == '' and note_off_lines == ''):
                     voiced_nodes.append(n)
                     new_func_str = voice_logic_taskfunc.format(n, note_on_lines, note_off_lines)
@@ -103,7 +103,7 @@ def parse_node_macros(code_lines, define_cache):
                     pre_assembly_lines.append(Line(cb_l, None, None))
         else:
             pre_assembly_lines.append(line_obj)
-        
+
     post_assembly_lines = deque()
     for line_obj in pre_assembly_lines:
         line = line_obj.command.lstrip()
@@ -120,15 +120,15 @@ def parse_node_macros(code_lines, define_cache):
             for n in node_cb:
                 open_lines = ''
                 close_lines = ''
-                
+
                 if 'UIOpen' in node_cb[n]:
                     open_lines = '\n'.join([l.command for l in node_cb[n]['UIOpen']])
                 if 'UIClose' in node_cb[n]:
                     close_lines = '\n'.join([l.command for l in node_cb[n]['UIClose']])
-                
+
                 if not (open_lines == '' and close_lines == ''):
                     node_ui_case = node_ui_switcher.format(n, open_lines, close_lines)
-                    
+
                     for cb_l in node_ui_case.split('\n'):
                         post_assembly_lines.append(Line(cb_l, None, None))
         else:
@@ -136,5 +136,33 @@ def parse_node_macros(code_lines, define_cache):
 
     return post_assembly_lines
 
-def ivls_node_assemble(lines, define_cache):
-    return parse_node_macros(lines, define_cache)
+import subprocess
+import os
+
+def execute_scripts(base_dir, code_lines):
+    new_lines = deque()
+
+    for lobj in code_lines:
+        line = lobj.command
+        if line.startswith("__SCRIPT__"):
+            # Extract the script path and arguments from the line
+            script_parts = line.strip("__SCRIPT__").strip("()").split(",")
+            script_path = script_parts[0].strip('"')
+            script_args = [arg.strip() for arg in script_parts[1:]]
+
+            # Execute the script with the provided arguments
+            print("Running {} with args {}".format(script_path, script_args))
+            code_cache_path = os.path.join(base_dir, 'code_cache.ksp')
+            with open(code_cache_path, 'w') as f:
+                f.write('\n'.join([line.command for line in code_lines]))
+            subprocess.call(["python", os.path.join(base_dir, script_path)] + [code_cache_path] + script_args)
+        else:
+            new_lines.append(lobj)
+
+    return new_lines
+
+def ivls_node_assemble(line_obj_list, define_cache):
+    return parse_node_macros(line_obj_list, define_cache)
+
+def script_injection(base_dir, line_obj_list):
+    return execute_scripts(base_dir, line_obj_list)
