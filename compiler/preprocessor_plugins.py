@@ -1633,7 +1633,7 @@ def handleDefineConstants(lines, define_cache = None):
 
     if define_cache is not None:
         defineConstants = define_cache
-        
+
         for l in lines:
             for dc in defineConstants:
                 l.command = dc.substituteValue(l.command, defineConstants, l)

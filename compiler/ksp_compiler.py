@@ -217,16 +217,17 @@ class ParseException(ExceptionWithMessage):
         if no_traceback:
             utils.disable_traceback()
 
-        if line.calling_line:
-            line_content = str(line.calling_line).strip()
+        if line.calling_lines:
+            macro_chain = '\n'.join(['=>{}'.format(l.command.strip()) for l in line.calling_lines])
+            line_content = 'Macro traceback:\n{}'.format(macro_chain, str(line).strip())
         else:
             line_content = str(line).strip()
 
         if line.node_cb:
             msg = "%s | %s\n\n%s\n%s\n\n%s" % (line.node_cb[0], line.node_cb[1], line_content, message, line.get_locations_string())
-        else:            
+        else:
             msg = "%s\n\n%s\n\n%s" % (message, line_content, line.get_locations_string())
-            
+
         Exception.__init__(self, msg)
         self.line = line
         self.message = msg
@@ -234,7 +235,7 @@ class ParseException(ExceptionWithMessage):
 class Line:
     '''Line object used for handling lines before AST lex/yacc parsing'''
 
-    def __init__(self, s, locations = None, namespaces = None, placeholders = placeholders, node_cb = None, calling_line = None):
+    def __init__(self, s, locations = None, namespaces = None, placeholders = placeholders, node_cb = None, calling_lines = None):
         # locations should be a list of (filename, lineno) tuples
         self.command = s # current line returned as string
         self.locations = locations or [(None, -1)] # filename and line number
@@ -242,7 +243,7 @@ class Line:
         self.placeholders = placeholders
         self.node_cb = node_cb
         self.source_locations = None
-        self.calling_line = calling_line
+        self.calling_lines = calling_lines
 
     def get_lineno(self):
         return self.locations[0][1]
@@ -261,7 +262,7 @@ class Line:
         ''' Returns a copy of the line.
             If the new_command parameter is specified, that will be the command of the new line
             and it will get the same indentation as the old line. '''
-        line = Line(self.command, self.locations, self.namespaces, node_cb=self.node_cb, calling_line=self.calling_line)
+        line = Line(self.command, self.locations, self.namespaces, node_cb=self.node_cb, calling_lines=self.calling_lines)
 
         if add_location:
             line.locations = line.locations + [add_location]
@@ -697,33 +698,34 @@ def expand_macros(lines, macros, level = 0, replace_raw = True, define_cache = N
                 # erase any inner comments to not disturb outer
                 macro_call_str = re.sub(white_space, '', macro_call_str)
                 normal_lines, callback_lines = extract_callback_lines(macro.lines[1:-1])
-                
+
                 contents = normal_lines + callback_lines
-                
+
                 from preprocessor_plugins import macro_iter_functions, post_macro_iter_functions, substituteDefines
                 convert_strings_to_placeholders(contents)
                 substituteDefines(contents, define_cache)
-            
+
                 while macro_iter_functions(contents, placeholders):
                     convert_strings_to_placeholders(contents)
                     substituteDefines(contents, define_cache)
-                    
+
                 while post_macro_iter_functions(contents, placeholders):
                     convert_strings_to_placeholders(contents)
                     substituteDefines(contents, define_cache)
 
                 for c in contents:
-                    if line.node_cb:
-                        c.calling_line = line
-                        if line.calling_line:
-                            c.calling_line = line.calling_line
+                    if not line.calling_lines:
+                        c.calling_lines = [line]
+                    else:
+                        c.calling_lines = line.calling_lines + [line]
 
+                    if line.node_cb:
                         c.node_cb = line.node_cb
 
                 new_lines.extend(contents)
-                
+
                 num_substitutions += 1
-                
+
     if num_substitutions:
         return expand_macros(new_lines, macros, level+1, replace_raw, define_cache)
     else:
