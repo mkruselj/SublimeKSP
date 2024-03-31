@@ -1,0 +1,9 @@
+<snippet>
+	<content><![CDATA[
+define FLOWS += ${1:flow_name}
+ivls.register_node(${1:flow_name}, Stl.Pedals)
+ivls.register_node(${1:flow_name}, Stl.PlayEvent)]]></content>
+	<description>callback</description>
+	<tabTrigger>flow</tabTrigger>
+	<scope>source.ksp</scope>
+</snippet>
