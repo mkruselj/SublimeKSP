@@ -1,0 +1,12 @@
+<snippet>
+	<content><![CDATA[
+node ${1:node_name}:
+	cb ICB:
+	cb NoteOn:
+	cb NoteOff:
+end on
+]]></content>
+	<description>callback</description>
+	<tabTrigger>node_basic</tabTrigger>
+	<scope>source.ksp</scope>
+</snippet>

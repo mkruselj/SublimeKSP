@@ -1,0 +1,18 @@
+<snippet>
+	<content><![CDATA[
+node ${1:node_name}:
+	cb ICB:
+	cb FirstLoad:
+	cb PCCB:
+	cb CC:
+	cb Keymaps:
+	cb Flows:
+	cb Functions:
+	cb NoteOn:
+	cb NoteOff:
+end on
+]]></content>
+	<description>callback</description>
+	<tabTrigger>node_common</tabTrigger>
+	<scope>source.ksp</scope>
+</snippet>
