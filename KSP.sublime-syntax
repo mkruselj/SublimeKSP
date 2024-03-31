@@ -142,7 +142,7 @@ contexts:
       comment: Control keywords
       scope: keyword.control.source.ksp
 
-    - match: '((function|macro|taskfunc) +([a-zA-Z0-9_.#]+)\s*)\(?'
+    - match: '((function|macro|taskfunc|node|cb) +([a-zA-Z0-9_.#]+)\s*)\(?'
       comment: Function definition
       captures:
         1: meta.function.source.ksp
@@ -238,7 +238,7 @@ contexts:
           pop: true
         - include: main
 
-    - match: '(?!#)\b(struct|define|literals|on|(inst)?pers|read|list *|end list|call|step|function|taskfunc|macro|declare|const|polyphonic|end|local|global|family|import|as|property|override|declare|ui_(label|button|switch|slider|menu|value_edit|waveform|wavetable|knob|table|xy|text_edit|level_meter|file_selector|panel|mouse_area))\b(?!#)'
+    - match: '(?!#)\b(struct|define|literals|on|(inst)?pers|read|list *|end list|call|step|function|taskfunc|node|macro|declare|const|polyphonic|end|local|global|family|import|as|property|override|declare|ui_(label|button|switch|slider|menu|value_edit|waveform|wavetable|knob|table|xy|text_edit|level_meter|file_selector|panel|mouse_area))\b(?!#)'
       comment: Other keywords
       scope: keyword.other.source.ksp
 

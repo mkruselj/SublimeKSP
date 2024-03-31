@@ -1,15 +1,17 @@
 from collections import defaultdict, deque, OrderedDict
 import utils
 
-voice_logic_taskfunc = '''
-    taskfunc ivls.{}.VoiceLogic(var self, var self_invalid, nenv)
+voice_logic_taskfunc_title = 'taskfunc ivls.{}.VoiceLogic(var self, var self_invalid, nenv)'
+voice_logic_taskfunc_pre_on = '''
         declare node_id := NodeEnv[nenv].node_id
         declare thread := Voice[self].thread
 
         if Voice[self].input = ivls.input_type.VOICE_ON
-            {}
+'''
+voice_logic_taskfunc_post_on = '''
         else if Voice[self].input = ivls.input_type.VOICE_OFF
-            {}
+'''
+voice_logic_taskfunc_post_off = '''
         end if
     end taskfunc
 '''
@@ -27,8 +29,12 @@ node_ui_switcher = '''
     end if
 '''
 
+def make_line_obj(code):
+    from ksp_compiler import Line, ParseException
+    return [Line(l, None, None) for l in code.split('\n')]
+    
 def parse_node_macros(code_lines, define_cache):
-    from ksp_compiler import Line
+    from ksp_compiler import Line, ParseException
 
     node_cb = OrderedDict()
 
@@ -49,44 +55,54 @@ def parse_node_macros(code_lines, define_cache):
     pruned_node_code = deque()
     ivls_syntax = False
     for line_obj in code_lines:
-        line = line_obj.command.lstrip()
-
+        line = line_obj.command.strip()
+        
         if line.startswith("macro Node."):
             if ivls_syntax:
-                raise Exception('You may not use SublimeKSP macros inside of IVLS nodes!')
+                raise ParseException(line_obj, 'You may not use SublimeKSP macros inside of IVLS nodes!')
             
             parts = line.split(".")
             current_node = ".".join(parts[1:-1])
             current_callback = parts[-1].split("(")[0]
             
             if current_callback in node_cb[current_node]:
-                raise Exception('Callback {} has been declared twice in node {}!'.format(current_callback, current_node))
-        elif line.startswith('macro'):
+                raise ParseException(line_obj, 'Callback {} has been declared twice in node {}!'.format(current_callback, current_node))
+        elif line.startswith('macro '):
             if ivls_syntax:
-                raise Exception('You may not use SublimeKSP macros inside of IVLS nodes!')
-        elif line.startswith("node") and line.endswith(':'):
+                raise ParseException(line_obj, 'You may not use SublimeKSP macros inside of IVLS nodes!')
+            else:
+                pruned_node_code.append(line_obj)
+        elif line.startswith("node "):
+            if not line.endswith(':'):
+                raise ParseException(line_obj, 'Node declaration must end in \':\'! \n {}')
+            
             ivls_syntax = True
             name = line.strip('node').strip(':').strip()
             if current_node:
-                raise Exception('You can not nest nodes! Found \'{}\' inside of \'{}\''.format(name, current_node))
+                raise ParseException(line_obj, 'You can not nest nodes! Found \'{}\' inside of \'{}\''.format(name, current_node))
             
             current_node = name
-        elif line.startswith("cb") and line.endswith(':'):
+        elif line.startswith("cb "):
+            if not line.endswith(':'):
+                raise ParseException(line_obj, 'Node declaration must end in \':\'!')
+            
             name = line.strip('cb').strip(':').strip()
             
             if not current_node:
-                raise Exception('Callback must be inside a node!')
+                raise ParseException(line_obj, 'Callback must be inside a node!')
             elif name in node_cb[current_node]:
-                raise Exception('Callback {} has been declared twice in node {}!'.format(name, current_node))
+                raise ParseException(line_obj, 'Callback {} has been declared twice in node {}!'.format(name, current_node))
             
             current_callback = name
-        elif line.startswith("end node"):
+        elif "end node" in line:
+            if not current_node:
+                raise ParseException(line_obj, 'Invalid end node!')
+            
             ivls_syntax = False
             current_node = None
-            current_callback = None
         elif line.startswith("end macro"):
             if ivls_syntax:
-                raise Exception('You may not use SublimeKSP macros inside of IVLS nodes!')
+                raise ParseException(line_obj, 'You may not use SublimeKSP macros inside of IVLS nodes!')
             if not current_node:
                 pruned_node_code.append(line_obj)
 
@@ -94,8 +110,13 @@ def parse_node_macros(code_lines, define_cache):
             current_callback = None
         else:
             if current_node and current_callback and current_node in node_order:
+                line_obj.source_locations = line_obj.locations
+                if current_callback != 'Functions':
+                    line_obj.node_cb = (current_node, current_callback)
+
                 if line.startswith('message('):
                     line_obj.command = line_obj.command.replace('message(', 'message("[ {} | {} ] " & '.format(current_node, current_callback))
+                
                 node_cb[current_node][current_callback].append(line_obj)
             else:
                 if not current_node:
@@ -115,19 +136,27 @@ def parse_node_macros(code_lines, define_cache):
 
         elif line.startswith("__DECLARE_VOICE_LOGIC__"):
             for n in node_cb:
-                note_on_lines = ''
-                note_off_lines = ''
+                note_on_lines = None
+                note_off_lines = None
 
                 if 'NoteOn' in node_cb[n]:
-                    note_on_lines = '\n'.join([l.command for l in node_cb[n]['NoteOn']])
+                    note_on_lines = node_cb[n]['NoteOn']
                 if 'NoteOff' in node_cb[n]:
-                    note_off_lines = '\n'.join([l.command for l in node_cb[n]['NoteOff']])
+                    note_off_lines = node_cb[n]['NoteOff']
 
-                if not (note_on_lines == '' and note_off_lines == ''):
+                if not (note_on_lines == None and note_off_lines == None):
                     voiced_nodes.append(n)
-                    new_func_str = voice_logic_taskfunc.format(n, note_on_lines, note_off_lines)
-                    for cb_l in new_func_str.split('\n'):
-                        pre_assembly_lines.append(Line(cb_l, None, None))
+                    new_func_lines = deque()
+                    new_func_lines.append(Line(voice_logic_taskfunc_title.format(n), None, None))
+                    new_func_lines += make_line_obj(voice_logic_taskfunc_pre_on)
+                    if note_on_lines:
+                        new_func_lines += note_on_lines
+                    new_func_lines += make_line_obj(voice_logic_taskfunc_post_on)
+                    if note_off_lines:
+                        new_func_lines += note_off_lines
+                    new_func_lines += make_line_obj(voice_logic_taskfunc_post_off)
+                        
+                    pre_assembly_lines.extend(new_func_lines)
 
         elif line.startswith("__SELECT_VOICE_LOGIC__"):
             for n in voiced_nodes:
