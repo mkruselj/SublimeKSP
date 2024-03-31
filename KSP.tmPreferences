@@ -24,7 +24,7 @@
 			</array>
 		</array>
  		<key>increaseIndentPattern</key>
-		<string>\s*(on|const|if|else|select|while|function|taskfunc|macro|for|family|struct|list|property|case)\b</string>
+		<string>\s*(on|const|if|else|select|while|function|node|cb|taskfunc|macro|for|family|struct|list|property|case)\b</string>
 		<key>decreaseIndentPattern</key>
 		<string>(?m)^\s*(end\s+(\w+)|case\b|else\b)</string>
 		<key>shellVariables</key>

@@ -630,7 +630,7 @@ class KspReindent(sublime_plugin.TextCommand):
         return line[:len(line) - len(line.lstrip())]
 
     def reindent(self, lines, indent):
-        increase_indent = re.compile(r'\s*(on|const|if|else|select|while|function|taskfunc|macro|for|family|struct|list|property|case)\b')
+        increase_indent = re.compile(r'\s*(on|const|if|else|select|while|function|taskfunc|macro|for|family|struct|list|property|case|node|cb)\b')
         decrease_indent = re.compile(r'(?m)^\s*(end\s+(\w+)|case\b|else\b)')
 
         result = []
@@ -698,7 +698,7 @@ class KspOnEnter(sublime_plugin.TextCommand):
             this_line = self.get_line(row)
             next_line = self.get_line(row + 1)
 
-            m = re.match(r'\s*(list|const|struct|on|if|select|while|function|taskfunc|macro|for|family|property)\b', prev_line)
+            m = re.match(r'\s*(list|const|struct|on|if|select|while|function|taskfunc|macro|node|cb|for|family|property)\b', prev_line)
 
             # if the next line is not an 'end ...' line, the next line is not already more indented and the regexp matched
             if (not (next_line and next_line.lstrip().startswith('end ') and
