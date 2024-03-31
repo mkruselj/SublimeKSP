@@ -4,6 +4,12 @@ node ${1:Product}:
 	cb PCCB:
 		ui.set_display("${1:Product} v0.1, compiled on " & __LOCALE_MONTH_ABBR__ & " " & __DAY__ & ", " & __YEAR__ & " at " & __LOCALE_TIME__)
 end node
+
+define PRODUCT_GUI_HEIGHT := 300
+function ui.hooks.add_display_footer() -> bool
+    bool := TRUE
+end function
+
 // -------------------------IVLS System Creation-------------------------------
 
 define ivls.THREADS := 4
@@ -19,26 +25,21 @@ import '_IVLS/builder.ksp'
 
 // -------------------------Standard Library Hooks ----------------------------
 
-macro Node.Stl.PlayEvent.EventArgs()
-    // event.note :=
-    // event.vel :=
-    // event.offset :=
-end macro
+node Stl.PlayEvent:
+    cb EventArgs():
+        // event.note :=
+        // event.vel :=
+        // event.offset :=
 
-macro Node.Stl.PlayEvent.EventGroups()
-    // Set group states in event.groups[]. All OFF by default. Can access Voice data from event_vo.
-    event.groups[0] := TRUE
-end macro
+    cb EventGroups():
+        // Set group states in event.groups[]. All OFF by default. Can access Voice data from event_vo.
+        event.groups[0] := TRUE
+
+end node
 
 function ivls.RoundRobins.hooks.get_max_rr(vo) -> rr_max
     rr_max := 0
-end function
-
-define PRODUCT_GUI_HEIGHT := 300
-function ui.hooks.add_display_footer() -> bool
-    bool := TRUE
-end function
-]]></content>
+end function]]></content>
 	<description>callback</description>
 	<tabTrigger>ivls</tabTrigger>
 	<scope>source.ksp</scope>

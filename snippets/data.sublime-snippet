@@ -1,0 +1,85 @@
+<snippet>
+	<content><![CDATA[
+define ${1:Something}.NUM_DIMS := 2
+define ${1:Something}.DIMS := layer, par
+define ${1:Something}.MULTS := layer         // all non-par dimensions, comma-separated
+define ${1:Something}.MULTS_CHAIN := layer   // if three dimensions, like ch, layer, par, this is `ch.layer`
+define ${1:Something}.SIZES := 8, 128        // oversizing dimensions helps preserve snapshots when expanding
+
+define ${1:Something}.layer.MEMBERS := ...
+    yin, ...
+    yang
+
+define ${1:Something}.par.MEMBERS := ...
+    enabled, ...
+    source_id, ...
+    volume
+define ${1:Something}.par.NAMES := ...       //currently unused, but intended for automation_names
+    "On" , ...
+    "Src" , ...
+    "Vol"
+define ${1:Something}.par.LONGNAMES := ...   //used in param display
+    "Enabled", ...
+    "Selected Sound", ...
+    "Volume"
+
+node ${2:Something.Engine}
+    cb ICB:
+        Data.InitializeDimension(${1:Something}, layer)
+        Data.InitializeDimension(${1:Something}, par)
+        Data.CreateMultiDim(${1:Something}) // or Data.CreateSingleSim(${1:Something}) if 1D
+
+        // decide what parameters are enabled
+        ${1:Something}.par_enabled[{some_layer, some_par}] := TRUE // or nest-loop through if better design
+
+        // link ui widgets, if necessary
+        ${1:Something}.layer[{???}].volume.ctrl_id := get_ui_id(my_product.ui.LayerKeys.Volume)
+
+        // Push data_ids to allow automatic UICB processing
+        ${1:Something}.push_data_id_to_ctrls()
+
+    cb PCCB:
+        Data.PCCB(${1:Something})
+
+    cb UICBS:
+        Data.UICBS(${1:Something})
+
+    cb Functions:
+        Data.Functions(${1:Something})
+
+        function ${1:Something}.check_version.response(version)
+        end function
+
+        function ${1:Something}.get_current_version() -> out
+            out := 0
+        end function
+
+        function ${1:Something}.par_cb.response(layer, par, value)
+            select par
+                case ${1:Something}.par.ENABLE
+                    {...}
+                case ${1:Something}.par.SOURCE_ID
+                    {...}
+                case ${1:Something}.par.VOLUME
+                    {...}
+            end select
+        end function
+
+        function ${1:Something}.par_disp.response(layer, par, value, par_prefix_str, par_value_str)
+            par_prefix_str := !${1:Something}.some_layer_names[layer]
+            select par
+                case ${1:Something}.par.ENABLED
+                    par_value_str := !onoff[value]
+                case ${1:Something}.par.SOURCE_ID
+                    par_value_str := ${1:Something}.some_source_names[value]
+                case ${1:Something}.par.VOLUME
+                    par_value_str := {something} & " dB"
+            end select
+        end function
+
+end node
+]]></content>
+	<description>callback</description>
+	<tabTrigger>data</tabTrigger>
+	<scope>source.ksp</scope>
+</snippet>
