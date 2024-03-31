@@ -224,7 +224,7 @@ class ParseException(ExceptionWithMessage):
             line_content = str(line).strip()
 
         if line.node_cb:
-            msg = "%s | %s\n\n%s\n%s\n\n%s" % (line.node_cb[0], line.node_cb[1], line_content, message, line.get_locations_string())
+            msg = "%s | %s\n\n%s\n\n%s\n\n%s" % (line.node_cb[0], line.node_cb[1], line_content, message, line.get_locations_string())
         else:
             msg = "%s\n\n%s\n\n%s" % (message, line_content, line.get_locations_string())
 
