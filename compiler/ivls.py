@@ -47,14 +47,46 @@ def parse_node_macros(code_lines, define_cache):
 
     # Extract the node callbacks
     pruned_node_code = deque()
+    ivls_syntax = False
     for line_obj in code_lines:
         line = line_obj.command.lstrip()
 
         if line.startswith("macro Node."):
+            if ivls_syntax:
+                raise Exception('You may not use SublimeKSP macros inside of IVLS nodes!')
+            
             parts = line.split(".")
             current_node = ".".join(parts[1:-1])
             current_callback = parts[-1].split("(")[0]
+            
+            if current_callback in node_cb[current_node]:
+                raise Exception('Callback {} has been declared twice in node {}!'.format(current_callback, current_node))
+        elif line.startswith('macro'):
+            if ivls_syntax:
+                raise Exception('You may not use SublimeKSP macros inside of IVLS nodes!')
+        elif line.startswith("node") and line.endswith(':'):
+            ivls_syntax = True
+            name = line.strip('node').strip(':').strip()
+            if current_node:
+                raise Exception('You can not nest nodes! Found \'{}\' inside of \'{}\''.format(name, current_node))
+            
+            current_node = name
+        elif line.startswith("cb") and line.endswith(':'):
+            name = line.strip('cb').strip(':').strip()
+            
+            if not current_node:
+                raise Exception('Callback must be inside a node!')
+            elif name in node_cb[current_node]:
+                raise Exception('Callback {} has been declared twice in node {}!'.format(name, current_node))
+            
+            current_callback = name
+        elif line.startswith("end node"):
+            ivls_syntax = False
+            current_node = None
+            current_callback = None
         elif line.startswith("end macro"):
+            if ivls_syntax:
+                raise Exception('You may not use SublimeKSP macros inside of IVLS nodes!')
             if not current_node:
                 pruned_node_code.append(line_obj)
 
