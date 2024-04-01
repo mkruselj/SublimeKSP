@@ -1,0 +1,11 @@
+<snippet>
+    <content><![CDATA[
+define Voice.MEMBERS += ${1:field_name}
+define Voice.INIT += ${1:field_name}.default_value
+declare ${1:field_name}.default_value[] := (0)
+define Voice.validate.${1:field_name}(#v#) := in_range(#v#, 0, 1)
+]]></content>
+    <description>voice field</description>
+    <tabTrigger>field</tabTrigger>
+    <scope>source.ksp</scope>
+</snippet>
