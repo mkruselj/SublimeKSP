@@ -1,0 +1,19 @@
+<snippet>
+	<content><![CDATA[
+{{ ${1:NodeName} }}
+
+define ${4:IVLS_NODES} += ${1:NodeName}
+node ${1:NodeName}:
+	cb ICB:
+	cb NoteOn:
+		ivls.pass()
+	cb NoteOff:
+		declare rel_vo := ivls.new_voice(self)
+		ivls.reflow_voice(rel_vo, ${2:release_event_flow})
+		ivls.play.oneshot(rel_vo, ${3:2000000})
+end node
+]]></content>
+	<description>callback</description>
+	<tabTrigger>node_release</tabTrigger>
+	<scope>source.ksp</scope>
+</snippet>

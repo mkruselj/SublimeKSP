@@ -1,0 +1,9 @@
+<snippet>
+	<content><![CDATA[
+declare ${1:new_vo} := ivls.new_voice(${2:self})
+
+ivls.play(${1:new_vo})]]></content>
+	<description>ivls new voice</description>
+	<tabTrigger>voice</tabTrigger>
+	<scope>source.ksp</scope>
+</snippet>

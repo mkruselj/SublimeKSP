@@ -23,6 +23,7 @@ define ${1:Something}.par.LONGNAMES := ...   //used in param display
     "Selected Sound", ...
     "Volume"
 
+define IVLS_NODES += ${2:Something.Engine}
 node ${2:Something.Engine}
     cb ICB:
         Data.InitializeDimension(${1:Something}, layer)

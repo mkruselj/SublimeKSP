@@ -1,7 +1,9 @@
 <snippet>
 	<content><![CDATA[
-define ${2:IVLS_NODES} += ${1:node_name}
-node ${1:node_name}:
+{{ ${1:NodeName} }}
+
+define ${2:IVLS_NODES} += ${1:NodeName}
+node ${1:NodeName}:
 	cb ICB:
 	cb FirstLoad:
 	cb PCCB:
@@ -11,7 +13,7 @@ node ${1:node_name}:
 	cb Functions:
 	cb NoteOn:
 	cb NoteOff:
-end on
+end node
 ]]></content>
 	<description>callback</description>
 	<tabTrigger>node_common</tabTrigger>

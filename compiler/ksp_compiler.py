@@ -218,8 +218,8 @@ class ParseException(ExceptionWithMessage):
             utils.disable_traceback()
 
         if line.calling_lines:
-            macro_chain = '\n'.join(['=>{}'.format(l.command.strip()) for l in line.calling_lines])
-            line_content = 'Macro traceback:\n{}'.format(macro_chain, str(line).strip())
+            macro_chain = '\n'.join(['=> {}'.format(l.command.strip()) for l in line.calling_lines])
+            line_content = 'Macro traceback:\n{}\n{}'.format(macro_chain, str(line).strip())
         else:
             line_content = str(line).strip()
 
