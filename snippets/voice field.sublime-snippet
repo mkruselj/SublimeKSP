@@ -1,7 +1,7 @@
 <snippet>
     <content><![CDATA[
-define Voice.MEMBERS += ${1:field_name}
-define Voice.INIT += ${1:field_name}.default_value
+define Voice.ADD_MEMBERS += ${1:field_name}
+define Voice.ADD_INIT += ${1:field_name}.default_value
 declare ${1:field_name}.default_value[] := (0)
 define Voice.validate.${1:field_name}(#v#) := in_range(#v#, 0, 1)
 ]]></content>
