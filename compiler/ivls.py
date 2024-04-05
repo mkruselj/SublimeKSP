@@ -21,6 +21,20 @@ case ivls.node.{0}
     ivls.{0}.VoiceLogic(self, self_invalid, nenv)
 '''
 
+voice_pass_taskfunc_title = 'taskfunc ivls.{}.VoicePass(var self)'
+voice_pass_taskfunc_pre_pass = '''
+        declare node_id := ivls.flows[Voice[self].flow, Voice[self].stage]
+        declare thread := Voice[self].thread
+'''
+voice_pass_taskfunc_post_pass = '''
+    end taskfunc
+'''
+
+voice_pass_case = '''
+case ivls.node.{0}
+    ivls.{0}.VoicePass(self)
+'''
+
 node_ui_switcher = '''
     if ivls.node.{0} = (ivls.NodeUI -> value)
         {1}
@@ -48,9 +62,11 @@ def parse_node_macros(code_lines, define_cache):
             node_names = utils.split_args(node_order, 0)
             break
 
+    node_passes = {}
     for name in node_names:
         node_cb[name] = defaultdict(list)
-
+        node_passes[name] = False
+    
     # Extract the node callbacks
     pruned_node_code = deque()
     ivls_syntax = False
@@ -67,6 +83,14 @@ def parse_node_macros(code_lines, define_cache):
             
             if current_callback in node_cb[current_node]:
                 raise ParseException(line_obj, 'Callback {} has been declared twice in node {}!'.format(current_callback, current_node))
+            
+            if current_callback == 'NotePass':
+                if 'NoteOn' in node_cb[current_node] or 'NoteOff' in node_cb[current_node]:
+                    raise ParseException(line_obj, 'Can not add NotePass callback to Node with NoteOn/NoteOff callback!'.format(current_callback, current_node))
+            elif current_callback == 'NoteOn' or current_callback == 'NoteOff':
+                if 'NotePass' in node_cb[current_node]:
+                    raise ParseException(line_obj, 'Can not add NoteOn or NoteOff callback to Node with NotePass callback!'.format(current_callback, current_node))
+            
         elif line.startswith('macro '):
             if ivls_syntax:
                 raise ParseException(line_obj, 'You may not use SublimeKSP macros inside of IVLS nodes!')
@@ -93,6 +117,13 @@ def parse_node_macros(code_lines, define_cache):
             elif name in node_cb[current_node]:
                 raise ParseException(line_obj, 'Callback {} has been declared twice in node {}!'.format(name, current_node))
             
+            if name == 'NotePass':
+                if 'NoteOn' in node_cb[current_node] or 'NoteOff' in node_cb[current_node]:
+                    raise ParseException(line_obj, 'Can not add NotePass callback to Node with NoteOn/NoteOff callback!'.format(name, current_node))
+            elif name == 'NoteOn' or name == 'NoteOff':
+                if 'NotePass' in node_cb[current_node]:
+                    raise ParseException(line_obj, 'Can not add NoteOn or NoteOff callback to Node with NotePass callback!'.format(name, current_node))
+            
             current_callback = name
         elif "end node" in line:
             if not current_node:
@@ -110,6 +141,9 @@ def parse_node_macros(code_lines, define_cache):
             current_callback = None
         else:
             if current_node and current_callback and current_node in node_order:
+                if current_callback == 'NotePass':
+                    node_passes[current_node] = True
+                
                 line_obj.source_locations = line_obj.locations
                 if current_callback != 'Functions':
                     line_obj.node_cb = (current_node, current_callback)
@@ -118,22 +152,36 @@ def parse_node_macros(code_lines, define_cache):
                     line_obj.command = line_obj.command.replace('message(', 'message("[ {} | {} ] " & '.format(current_node, current_callback))
                 
                 node_cb[current_node][current_callback].append(line_obj)
+                
+                if current_callback == 'NotePass':
+                    if ('ivls.play' in line or 'ivls.pass' in line):
+                        raise ParseException(line_obj, 'You may not use ivls.play() variants or ivls.pass in NotePass callbacks!')
+                
+                if current_callback == 'NoteOff' and ('ivls.play(' in line or 'ivls.pass' in line):
+                    raise ParseException(line_obj, 'You may not use ivls.play() or ivls.pass() in NoteOff callbacks! Use ivls.play.oneshot() to prevent hangs.')
             else:
                 if not current_node:
                     pruned_node_code.append(line_obj)
+
+    for n in node_cb:
+        print(n)
 
     # Inject Nodes directly in where IVLS commands are found
     pre_assembly_lines = deque()
     voiced_nodes = []
     for line_obj in pruned_node_code:
         line = line_obj.command.lstrip()
+        
         if line.startswith("__RUN_CB__"):
             cb_name = line.split('(')[1].split(')')[0]
             for node in node_cb:
                 if cb_name in node_cb[node]:
                     for cb_l in node_cb[node][cb_name]:
                         pre_assembly_lines.append(cb_l)
-
+        elif line.startswith("__CACHE_PASSES__"):
+            for n in node_cb:
+                if node_passes[n] == True:
+                    pre_assembly_lines.append(Line('ivls.node_passes[ivls.node.{}] := TRUE'.format(n), None, None))
         elif line.startswith("__DECLARE_VOICE_LOGIC__"):
             for n in node_cb:
                 note_on_lines = None
@@ -157,13 +205,12 @@ def parse_node_macros(code_lines, define_cache):
                     new_func_lines += make_line_obj(voice_logic_taskfunc_post_off)
                         
                     pre_assembly_lines.extend(new_func_lines)
-
         elif line.startswith("__SELECT_VOICE_LOGIC__"):
-            for n in voiced_nodes:
-                new_case = voice_logic_case.format(n)
-                for cb_l in new_case.split('\n'):
-                    pre_assembly_lines.append(Line(cb_l, None, None))
-
+            for n in node_cb:
+                if n in voiced_nodes:
+                    new_case = voice_logic_case.format(n)
+                    for cb_l in new_case.split('\n'):
+                        pre_assembly_lines.append(Line(cb_l, None, None))
         else:
             pre_assembly_lines.append(line_obj)
 
@@ -193,9 +240,33 @@ def parse_node_macros(code_lines, define_cache):
 
                     for cb_l in node_ui_case.split('\n'):
                         post_assembly_lines.append(Line(cb_l, None, None))
+        elif line.startswith("__DECLARE_VOICE_PASS__"):
+            for n in node_passes:
+                if node_passes[n] == True:
+                    note_pass_lines = None
+                
+                    if 'NotePass' in node_cb[n]:
+                        note_pass_lines = node_cb[n]['NotePass']
+
+                    if not (note_pass_lines == None):
+                        voiced_nodes.append(n)
+                        new_func_lines = deque()
+                        new_func_lines.append(Line(voice_pass_taskfunc_title.format(n), None, None))
+                        new_func_lines += make_line_obj(voice_pass_taskfunc_pre_pass)
+                        if note_pass_lines:
+                            new_func_lines += note_pass_lines
+                        new_func_lines += make_line_obj(voice_pass_taskfunc_post_pass)
+                            
+                        post_assembly_lines.extend(new_func_lines)
+        elif line.startswith("__SELECT_VOICE_PASS__"):
+            for n in node_cb:
+                if node_passes[n] == True:
+                    new_case = voice_pass_case.format(n)
+                    for cb_l in new_case.split('\n'):
+                        post_assembly_lines.append(Line(cb_l, None, None))
         else:
             post_assembly_lines.append(line_obj)
-
+            
     return post_assembly_lines
 
 import subprocess
