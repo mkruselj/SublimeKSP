@@ -1,15 +1,16 @@
 from collections import defaultdict, deque, OrderedDict
 import utils
 
-voice_logic_taskfunc_title = 'taskfunc ivls.{}.VoiceLogic(var self, var self_invalid, nenv)'
+voice_logic_taskfunc_title = 'taskfunc ivls.{}.VoiceLogic(var self, var self_invalid, var user_continue, nenv)'
 voice_logic_taskfunc_pre_on = '''
         declare node_id := NodeEnv[nenv].node_id
         declare thread := Voice[self].thread
+        declare old_self := -1
 
-        if Voice[self].input = ivls.input_type.VOICE_ON
+        if NodeEnv[nenv].input_type = ivls.input_type.VOICE_ON
 '''
 voice_logic_taskfunc_post_on = '''
-        else if Voice[self].input = ivls.input_type.VOICE_OFF
+        else if NodeEnv[nenv].input_type = ivls.input_type.VOICE_OFF
 '''
 voice_logic_taskfunc_post_off = '''
         end if
@@ -18,10 +19,10 @@ voice_logic_taskfunc_post_off = '''
 
 voice_logic_case = '''
 case ivls.node.{0}
-    ivls.{0}.VoiceLogic(self, self_invalid, nenv)
+    ivls.{0}.VoiceLogic(self, self_invalid, user_continue, nenv)
 '''
 
-voice_pass_taskfunc_title = 'taskfunc ivls.{}.VoicePass(var self)'
+voice_pass_taskfunc_title = 'taskfunc ivls.{}.VoicePass(var self, var user_continue)'
 voice_pass_taskfunc_pre_pass = '''
         declare node_id := ivls.flows[Voice[self].flow, Voice[self].stage]
         declare thread := Voice[self].thread
@@ -32,7 +33,7 @@ voice_pass_taskfunc_post_pass = '''
 
 voice_pass_case = '''
 case ivls.node.{0}
-    ivls.{0}.VoicePass(self)
+    ivls.{0}.VoicePass(self, user_continue)
 '''
 
 node_ui_switcher = '''
@@ -63,9 +64,11 @@ def parse_node_macros(code_lines, define_cache):
             break
 
     node_passes = {}
+    node_offs = {}
     for name in node_names:
         node_cb[name] = defaultdict(list)
         node_passes[name] = False
+        node_offs[name] = False
     
     # Extract the node callbacks
     pruned_node_code = deque()
@@ -80,6 +83,9 @@ def parse_node_macros(code_lines, define_cache):
             parts = line.split(".")
             current_node = ".".join(parts[1:-1])
             current_callback = parts[-1].split("(")[0]
+            
+            if current_node not in node_cb:
+                node_cb[current_node] = defaultdict(list)
             
             if current_callback in node_cb[current_node]:
                 raise ParseException(line_obj, 'Callback {} has been declared twice in node {}!'.format(current_callback, current_node))
@@ -106,6 +112,9 @@ def parse_node_macros(code_lines, define_cache):
                 raise ParseException(line_obj, 'You can not nest nodes! Found \'{}\' inside of \'{}\''.format(name, current_node))
             
             current_node = name
+            
+            if current_node not in node_cb:
+                node_cb[current_node] = defaultdict(list)
         elif line.startswith("cb "):
             if not line.endswith(':'):
                 raise ParseException(line_obj, 'Node declaration must end in \':\'!')
@@ -143,6 +152,9 @@ def parse_node_macros(code_lines, define_cache):
             if current_node and current_callback and current_node in node_order:
                 if current_callback == 'NotePass':
                     node_passes[current_node] = True
+
+                if current_callback == 'NoteOff':
+                    node_offs[current_node] = True
                 
                 line_obj.source_locations = line_obj.locations
                 if current_callback != 'Functions':
@@ -163,7 +175,7 @@ def parse_node_macros(code_lines, define_cache):
                 if not current_node:
                     pruned_node_code.append(line_obj)
 
-    for n in node_cb:
+    for n in node_names:
         print(n)
 
     # Inject Nodes directly in where IVLS commands are found
@@ -174,16 +186,20 @@ def parse_node_macros(code_lines, define_cache):
         
         if line.startswith("__RUN_CB__"):
             cb_name = line.split('(')[1].split(')')[0]
-            for node in node_cb:
+            for node in node_names:
                 if cb_name in node_cb[node]:
                     for cb_l in node_cb[node][cb_name]:
                         pre_assembly_lines.append(cb_l)
         elif line.startswith("__CACHE_PASSES__"):
-            for n in node_cb:
+            for n in node_names:
                 if node_passes[n] == True:
                     pre_assembly_lines.append(Line('ivls.node_passes[ivls.node.{}] := TRUE'.format(n), None, None))
+        elif line.startswith("__CACHE_OFFS__"):
+            for n in node_names:
+                if node_offs[n] == True:
+                    pre_assembly_lines.append(Line('ivls.node_offs[ivls.node.{}] := TRUE'.format(n), None, None))
         elif line.startswith("__DECLARE_VOICE_LOGIC__"):
-            for n in node_cb:
+            for n in node_names:
                 note_on_lines = None
                 note_off_lines = None
 
@@ -206,7 +222,7 @@ def parse_node_macros(code_lines, define_cache):
                         
                     pre_assembly_lines.extend(new_func_lines)
         elif line.startswith("__SELECT_VOICE_LOGIC__"):
-            for n in node_cb:
+            for n in node_names:
                 if n in voiced_nodes:
                     new_case = voice_logic_case.format(n)
                     for cb_l in new_case.split('\n'):
@@ -221,12 +237,12 @@ def parse_node_macros(code_lines, define_cache):
 
         if line.startswith("__RUN_CB__"):
             cb_name = line.split('(')[1].split(')')[0]
-            for node in node_cb:
+            for node in node_names:
                 if cb_name in node_cb[node]:
                     for cb_l in node_cb[node][cb_name]:
                         post_assembly_lines.append(cb_l)
         elif "__COMPILE_NODE_SWITCHER__" in line:
-            for n in node_cb:
+            for n in node_names:
                 open_lines = ''
                 close_lines = ''
 
@@ -259,7 +275,7 @@ def parse_node_macros(code_lines, define_cache):
                             
                         post_assembly_lines.extend(new_func_lines)
         elif line.startswith("__SELECT_VOICE_PASS__"):
-            for n in node_cb:
+            for n in node_names:
                 if node_passes[n] == True:
                     new_case = voice_pass_case.format(n)
                     for cb_l in new_case.split('\n'):
