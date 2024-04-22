@@ -66,7 +66,6 @@ def parse_node_macros(code_lines, define_cache):
     node_passes = {}
     node_offs = {}
     for name in node_names:
-        node_cb[name] = defaultdict(list)
         node_passes[name] = False
         node_offs[name] = False
     
@@ -175,8 +174,10 @@ def parse_node_macros(code_lines, define_cache):
                 if not current_node:
                     pruned_node_code.append(line_obj)
 
-    for n in node_names:
-        print(n)
+    unfound = []
+    unfound.extend(['- ' + n for n in node_names if n not in node_cb])    
+    if len(unfound) > 0:
+        raise ParseException(pruned_node_code[0], 'Nodes added to assembly by developer, but source code not found: \n\n' + '\n'.join(unfound))
 
     # Inject Nodes directly in where IVLS commands are found
     pre_assembly_lines = deque()
