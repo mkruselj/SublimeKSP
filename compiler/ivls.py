@@ -106,7 +106,14 @@ def parse_node_macros(code_lines, define_cache):
                 raise ParseException(line_obj, 'Node declaration must end in \':\'! \n {}')
             
             ivls_syntax = True
-            name = line.strip('node').strip(':').strip()
+            
+            if line.startswith("node ") and " from " in line:
+                name = line.split(" from ")[0]
+            else:
+                name = line
+
+            name = name.strip('node').strip(':').strip()
+                
             if current_node:
                 raise ParseException(line_obj, 'You can not nest nodes! Found \'{}\' inside of \'{}\''.format(name, current_node))
             
@@ -114,6 +121,7 @@ def parse_node_macros(code_lines, define_cache):
             
             if current_node not in node_cb:
                 node_cb[current_node] = defaultdict(list)
+
         elif line.startswith("cb "):
             if not line.endswith(':'):
                 raise ParseException(line_obj, 'Node declaration must end in \':\'!')
@@ -148,7 +156,7 @@ def parse_node_macros(code_lines, define_cache):
             current_node = None
             current_callback = None
         else:
-            if current_node and current_callback and current_node in node_order:
+            if current_node and current_callback:
                 if current_callback == 'NotePass':
                     node_passes[current_node] = True
 
@@ -178,6 +186,49 @@ def parse_node_macros(code_lines, define_cache):
     unfound.extend(['- ' + n for n in node_names if n not in node_cb])    
     if len(unfound) > 0:
         raise ParseException(pruned_node_code[0], 'Nodes added to assembly by developer, but source code not found: \n\n' + '\n'.join(unfound))
+
+    # Extract extender nodes and resolve inheritance
+    extender_nodes = {}
+    for line_obj in code_lines:
+        line = line_obj.command.strip()
+        if line.startswith("node ") and " from " in line:
+            extender_node, base_node = line.split(" from ")
+            extender_node = extender_node.strip("node").strip(":").strip()
+            base_node = base_node.strip(":").strip()
+
+            if base_node not in node_cb:
+                raise ParseException(line_obj, "Base node '{}' is not defined.".format(base_node))
+
+            extender_nodes[extender_node] = base_node
+
+    for extender_node, base_node in extender_nodes.items():
+        # Copy base node callbacks to extender node
+        for callback, lines in node_cb[base_node].items():
+            if callback in node_cb[extender_node]:
+                continue
+            
+            node_cb[extender_node][callback] = []
+            
+            new_lines = []
+            for line_obj in lines:
+                if "__VIRTUAL__" in line_obj.command:
+                    virtual_callback = line_obj.command.split("__VIRTUAL__")[1].strip("()").strip()
+                    if virtual_callback in node_cb[extender_node]:
+                        new_lines.extend(node_cb[extender_node][virtual_callback])
+                    else:
+                        raise ParseException(line_obj, "Virtual callback '{}' not found in extender node '{}'.".format(virtual_callback, extender_node))
+                else:
+                    new_lines.append(line_obj)
+            
+            node_cb[extender_node][callback] = new_lines
+
+    # Remove base nodes that have extenders
+    for extender_node, base_node in extender_nodes.items():
+        if base_node in node_cb:
+            if base_node in node_names:
+                raise ParseException(pruned_node_code[0], "Base nodes may not be added to assembly! Found base node '{}'.".format(base_node))
+            
+            del node_cb[base_node]
 
     # Inject Nodes directly in where IVLS commands are found
     pre_assembly_lines = deque()
