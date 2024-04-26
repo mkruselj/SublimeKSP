@@ -215,6 +215,9 @@ def parse_node_macros(code_lines, define_cache):
                     virtual_callback = line_obj.command.split("__VIRTUAL__")[1].strip("()").strip()
                     if virtual_callback in node_cb[extender_node]:
                         new_lines.extend(node_cb[extender_node][virtual_callback])
+                        
+                        # Remove this callback. Prevents calling itself if contains __RUN_CB__.
+                        del node_cb[extender_node][virtual_callback]
                     else:
                         raise ParseException(line_obj, "Virtual callback '{}' not found in extender node '{}'.".format(virtual_callback, extender_node))
                 else:
