@@ -1,0 +1,22 @@
+<snippet>
+	<content><![CDATA[
+{{ Type.${1:NewType} }}
+
+macro ${1:NewType}.def()
+    define ${1:NewType}.MEMBERS := 
+    declare ${1:NewType}.INIT[] := ()
+end macro
+
+define ${2:IVLS_NODES} += Type.${1:NewType}
+node Type.${1:NewType}:
+    cb ICB:
+        type.CreateCustomPool(${1:NewType}, 1000000)
+        
+    cb Functions:
+        type.Functions(${1:NewType})
+end node
+]]></content>
+	<description>component</description>
+	<tabTrigger>type</tabTrigger>
+	<scope>source.ksp</scope>
+</snippet>
