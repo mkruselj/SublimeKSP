@@ -2102,6 +2102,10 @@ class KSPCompiler(object):
 
         handleSanitizeExitCommand(self.lines)
 
+    def ivls_pre_analyze(self):
+        from ivls import ivls_pre_analyze
+        self.lines = ivls_pre_analyze(self.lines)
+        
     def ivls_node_assemble(self):
         from ivls import ivls_node_assemble
         self.lines = ivls_node_assemble(self.lines, self.define_cache)
@@ -2322,6 +2326,7 @@ class KSPCompiler(object):
             #      description                        function                                                                           condition     time-weight
             tasks = [
                  ('processing extensions',            lambda: self.extensions_with_macros(),                                             True,                   1),
+                 ('ivls pre-analysis',                lambda: self.ivls_pre_analyze(),                                                   True,                   1),
                  ('pre-macro processes',              lambda: self.run_pre_macro_functions(),                                            True,                   1),
                  ('ivls node assembly',               lambda: self.ivls_node_assemble(),                                                 True,                   1),
 

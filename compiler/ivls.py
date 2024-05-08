@@ -1,5 +1,53 @@
 from collections import defaultdict, deque, OrderedDict
 import utils
+from ksp_compiler import Line, ParseException
+
+def ivls_pre_analyze(line_obj_list):
+    # custom fields
+    fields = []
+    
+    pruned_code = deque()
+    for line_obj in line_obj_list:
+        line = line_obj.command.strip()
+        
+        if line.startswith("vo_field"):
+            import re
+            match = re.match(r"vo_field\s+(\w+)\s*=\s*(\d+)\s+if\s+(.+)", line)
+            
+            if not (match and match.group(1) and match.group(2) and match.group(3)):
+                raise ParseException(Line(line, [None, line_no], None), 'Field declarations must be in form "vo_field \'name\' = \'default value\' if (\'boolean expression\')!')
+            
+            var_name = match.group(1)
+            value = match.group(2)
+            predicate = match.group(3)
+            
+            fields.append((var_name, value, predicate, line_obj.get_lineno(), line))
+        else:
+            pruned_code.append(line_obj)
+    
+    starter_node = deque()
+    starter_node.append(Line('define IVLS_NODES += COMPILER', [(None, 1)], None))
+    starter_node.append(Line('node COMPILER:', [(None, 1)], None))
+    starter_node.append(Line('    cb ICB:', [(None, 2)], None))
+    
+    for f in fields:
+        name, default, predicate, line_no, line = f
+        
+        if name not in predicate:
+            raise ParseException(Line(line, [None, line_no], None), 'Field requires field name in validation expression!')
+            
+        pattern = r'(?<![\w\.])' + re.escape(name) + r'(?![\w\.])'
+        predicate = re.sub(pattern, "#v#", predicate)
+        
+        starter_node.append(Line('define Voice.ADD_MEMBERS += {}'.format(name), [[None, line_no]], None))
+        starter_node.append(Line('define Voice.ADD_INIT += {}.default_value'.format(name), [[None, line_no]], None))
+        starter_node.append(Line('declare {}.default_value[] := ({})'.format(name, default), [[None, line_no]], None))
+        starter_node.append(Line('define Voice.validate.{}(#v#) := {}'.format(name, predicate), [[None, line_no]], None))
+        
+    starter_node.append(Line('end node', [(None, 3)], None))
+    starter_node.extend(pruned_code)
+    
+    return starter_node
 
 voice_logic_taskfunc_title = 'taskfunc ivls.{}.VoiceLogic(var self, var self_invalid, var user_continue, nenv)'
 voice_logic_taskfunc_pre_on = '''
@@ -68,7 +116,7 @@ def parse_node_macros(code_lines, define_cache):
     for name in node_names:
         node_passes[name] = False
         node_offs[name] = False
-    
+
     # Extract the node callbacks
     pruned_node_code = deque()
     ivls_syntax = False
@@ -140,7 +188,7 @@ def parse_node_macros(code_lines, define_cache):
                 if 'NotePass' in node_cb[current_node]:
                     raise ParseException(line_obj, 'Can not add NoteOn or NoteOff callback to Node with NotePass callback!'.format(name, current_node))
             
-            current_callback = name
+            current_callback = name          
         elif "end node" in line:
             if not current_node:
                 raise ParseException(line_obj, 'Invalid end node!')
