@@ -32,9 +32,11 @@ import time
 import json
 import copy
 import utils
+import sublime
 
 variable_prefixes = '$%@!?~'
 
+compiler_path = os.path.join(sublime.packages_path(), 'KSP (Kontakt Script Processor)', 'compiler')
 
 # regular expressions:
 white_space_re = r'(\s*(\{[^\n]*?\})?\s*)'
@@ -440,7 +442,6 @@ def parse_lines_and_handle_imports(basepath, source, compiler_import_cache, file
             return [(filepath, src)]
 
         path = os.path.abspath(os.path.join(basepath, filepath))
-
         # list of paths to import (covers the case of importing a folder)
         paths = []
 
@@ -474,6 +475,7 @@ def parse_lines_and_handle_imports(basepath, source, compiler_import_cache, file
     if preprocessor_func:
         source = preprocessor_func(source, namespaces)
 
+    source += '\nimport \"_IVLS/builder.ksp\"'
     lines = parse_lines(source, filename, namespaces)
     new_lines = collections.deque()
 
@@ -494,8 +496,21 @@ def parse_lines_and_handle_imports(basepath, source, compiler_import_cache, file
             filename = m.group('filename')
             namespace = m.group('asname')
 
-            new_sources = read_path(basepath, filename)
-
+            if basepath:
+                if '_IVLS' in filename and not os.path.isdir(os.path.join(basepath, '_IVLS')):
+                    new_sources = read_path(compiler_path, filename)
+                    print("Saved file, loading internal IVLS.")
+                else:
+                    new_sources = read_path(basepath, filename)
+                    print("Saved file, loading external IVLS.")
+            else:
+                print(compiler_path)
+                if '_IVLS' in filename:
+                    new_sources = read_path(compiler_path, filename)
+                    print("Unsaved file, loading internal IVLS.")
+                else:
+                    raise Exception('Must save file before using non-STL imports!')
+            
             for path, source in new_sources:
                 if path not in compiler_import_cache:
                     compiler_import_cache.append(path)
@@ -2141,7 +2156,7 @@ class KSPCompiler(object):
 
             if not os.path.isabs(dir_check):
                 if self.basedir == None:
-                    raise Exception('Please save the file to hard drive before attempting to compile to a relative path!')
+                    break
 
                 dir_check = os.path.join(self.basedir, dir_check)
 

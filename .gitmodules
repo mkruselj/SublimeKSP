@@ -1,0 +1,3 @@
+[submodule "compiler/_IVLS"]
+	path = compiler/_IVLS
+	url = https://gitlab.com/isworks-official/ivls-sdk.git

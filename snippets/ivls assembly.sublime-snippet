@@ -39,7 +39,7 @@ node ${1:Product}.PlayEvent from Stl.PlayEvent.Template:
 end node
 
 define IVLS_NODES += ${1:Product}.StlHooks
-node ${1:Product}.STLHooks:
+node ${1:Product}.StlHooks:
     cb Functions:
         function ivls.RoundRobins.hooks.get_max_rr(vo) -> rr_max
             rr_max := 0
