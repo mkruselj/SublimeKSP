@@ -25,7 +25,7 @@ import '_IVLS/builder.ksp'
 
 // -------------------------Standard Library Hooks ----------------------------
 
-node Stl.PlayEvent:
+node ${1:Product}.PlayEvent from Stl.PlayEvent.Template:
     cb EventArgs():
         // event.note :=
         // event.vel :=
@@ -35,11 +35,12 @@ node Stl.PlayEvent:
         // Set group states in event.groups[]. All OFF by default. Can access Voice data from event_vo.
         event.groups[0] := TRUE
 
-end node
+    cb Functions:
+        function ivls.RoundRobins.hooks.get_max_rr(vo) -> rr_max
+            rr_max := 0
+        end function
 
-function ivls.RoundRobins.hooks.get_max_rr(vo) -> rr_max
-    rr_max := 0
-end function]]></content>
+end node]]></content>
 	<description>callback</description>
 	<tabTrigger>ivls</tabTrigger>
 	<scope>source.ksp</scope>
