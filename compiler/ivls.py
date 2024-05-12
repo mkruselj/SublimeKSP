@@ -15,7 +15,7 @@ def ivls_pre_analyze(line_obj_list):
             match = re.match(r"vo_field\s+(\w+)\s*=\s*(\d+)\s+if\s+(.+)", line)
             
             if not (match and match.group(1) and match.group(2) and match.group(3)):
-                raise ParseException(Line(line, [None, line_no], None), 'Field declarations must be in form "vo_field \'name\' = \'default value\' if (\'boolean expression\')!')
+                raise ParseException(Line(line, [None, 0], None), 'Field declarations must be in form "vo_field \'name\' = \'default value\' if (\'boolean expression\')!')
             
             var_name = match.group(1)
             value = match.group(2)
