@@ -428,7 +428,7 @@ def convert_strings_to_placeholders(lines):
     else:
         lines.command = string_re.sub(replace_func, lines.command)
 
-def parse_lines_and_handle_imports(basepath, source, compiler_import_cache, filename = None, namespaces = None, preprocessor_func = None):
+def parse_lines_and_handle_imports(use_ivls, basepath, source, compiler_import_cache, filename = None, namespaces = None, preprocessor_func = None):
     '''parses lines into Line objects and imports all files. preprocessor_func does not mean preprocessor_plugins'''
 
     def read_path(basepath, filepath):
@@ -475,7 +475,8 @@ def parse_lines_and_handle_imports(basepath, source, compiler_import_cache, file
     if preprocessor_func:
         source = preprocessor_func(source, namespaces)
 
-    source += '\nimport \"_IVLS/builder.ksp\"'
+    if use_ivls:
+        source += '\nimport \"_IVLS/builder.ksp\"'
     lines = parse_lines(source, filename, namespaces)
     new_lines = collections.deque()
 
@@ -526,7 +527,7 @@ def parse_lines_and_handle_imports(basepath, source, compiler_import_cache, file
                     if preprocessor_func:
                         preproc_s = preprocessor_func(source, namespaces)
 
-                    new_lines.extend(parse_lines_and_handle_imports(basepath, preproc_s, compiler_import_cache, path, namespaces))
+                    new_lines.extend(parse_lines_and_handle_imports(use_ivls, basepath, preproc_s, compiler_import_cache, path, namespaces))
         # non-import line so just add it to result line list:
         else:
             new_lines.append(line)
@@ -2045,10 +2046,18 @@ class KSPCompiler(object):
         self.compiler_options_to_override = dict()
 
         self.compiler_import_cache = []
+        
+        self.ivls_build = False
 
     def do_imports_and_convert_to_line_objects(self):
+        # Check if IVLS
+        if '__IVLS__' in self.source:
+            self.source = self.source.replace('__IVLS__', '')
+            self.ivls_build = True
+        
         # Import files
-        self.lines = parse_lines_and_handle_imports(self.basedir,
+        self.lines = parse_lines_and_handle_imports(self.ivls_build,
+                                                    self.basedir,
                                                     self.source,
                                                     self.compiler_import_cache,
                                                     preprocessor_func = self.examine_pragmas)
@@ -2075,7 +2084,7 @@ class KSPCompiler(object):
 
         # Add TCM code if tcm.init() is found
         if re.search(r'(?m)^\s*tcm.init', check_source):
-            self.lines += parse_lines_and_handle_imports(self.basedir,
+            self.lines += parse_lines_and_handle_imports(self.ivls_build, self.basedir,
                                                          taskfunc_code,
                                                          self.compiler_import_cache,
                                                          preprocessor_func = self.examine_pragmas)
