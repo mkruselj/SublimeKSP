@@ -4,7 +4,7 @@ from ksp_compiler import Line, ParseException
 
 def ivls_pre_analyze(line_obj_list):
     # custom fields
-    fields = []
+    fields = {}
     
     pruned_code = deque()
     for line_obj in line_obj_list:
@@ -12,7 +12,7 @@ def ivls_pre_analyze(line_obj_list):
         
         if line.startswith("vo_field"):
             import re
-            match = re.match(r"vo_field\s+(\w+)\s*=\s*(.+)\s+if\s+(.+)", line)
+            match = re.match(r"vo_field\s+([\w\.]+)\s*=\s*(.+)\s+if\s+(.+)", line)
             
             if not (match and match.group(1) and match.group(2) and match.group(3)):
                 raise ParseException(Line(line, [(None, 0)], None), 'Field declarations must be in form "vo_field \'name\' = \'default value\' if (\'boolean expression\')!')
@@ -21,33 +21,34 @@ def ivls_pre_analyze(line_obj_list):
             value = match.group(2)
             predicate = match.group(3)
             
-            fields.append((var_name, value, predicate, line_obj.get_lineno(), line))
+            fields[var_name] = (value, predicate, line_obj.get_lineno(), line)
+            
+            pruned_code.append(Line("__FIELD__,{}".format(var_name), [(None, line_obj.get_lineno())], None))
         else:
             pruned_code.append(line_obj)
     
-    starter_node = deque()
-    starter_node.append(Line('define IVLS_NODES += COMPILER', [(None, 1)], None))
-    starter_node.append(Line('node COMPILER:', [(None, 1)], None))
-    starter_node.append(Line('    cb ICB:', [(None, 2)], None))
-    
-    for f in fields:
-        name, default, predicate, line_no, line = f
+    subbed_code = deque()
+    for line_obj in pruned_code:
+        line = line_obj.command.strip()
         
-        if name not in predicate:
-            raise ParseException(Line(line, [None, line_no], None), 'Field requires field name in validation expression!')
+        if line.startswith("__FIELD__"):
+            name = line.split(',')[1]
+            default, predicate, line_no, line = fields[name]
             
-        pattern = r'(?<![\w\.])' + re.escape(name) + r'(?![\w\.])'
-        predicate = re.sub(pattern, "#v#", predicate)
-        
-        starter_node.append(Line('define Voice.ADD_MEMBERS += {}'.format(name), [[None, line_no]], None))
-        starter_node.append(Line('define Voice.ADD_INIT += {}.default_value'.format(name), [[None, line_no]], None))
-        starter_node.append(Line('declare {}.default_value[] := ({})'.format(name, default), [[None, line_no]], None))
-        starter_node.append(Line('define Voice.validate.{}(#v#) := {}'.format(name, predicate), [[None, line_no]], None))
-        
-    starter_node.append(Line('end node', [(None, 3)], None))
-    starter_node.extend(pruned_code)
+            if name not in predicate:
+                raise ParseException(Line(line, [(None, line_no)], None), 'Field requires field name in validation expression!')
+                
+            pattern = r'(?<![\w\.])' + re.escape(name) + r'(?![\w\.])'
+            predicate = re.sub(pattern, "#v#", predicate)
+            
+            subbed_code.append(Line('define Voice.ADD_MEMBERS += {}'.format(name), [[None, line_no]], None))
+            subbed_code.append(Line('define Voice.ADD_INIT += {}.default_value'.format(name), [[None, line_no]], None))
+            subbed_code.append(Line('declare {}.default_value[] := ({})'.format(name, default), [[None, line_no]], None))
+            subbed_code.append(Line('define Voice.validate.{}(#v#) := {}'.format(name, predicate), [[None, line_no]], None))
+        else:
+            subbed_code.append(line_obj)
     
-    return starter_node
+    return subbed_code
 
 voice_logic_taskfunc_title = 'taskfunc ivls.{}.VoiceLogic(var self, var self_invalid, var user_continue, nenv)'
 voice_logic_taskfunc_pre_on = '''

@@ -428,7 +428,7 @@ def convert_strings_to_placeholders(lines):
     else:
         lines.command = string_re.sub(replace_func, lines.command)
 
-def parse_lines_and_handle_imports(use_ivls, basepath, source, compiler_import_cache, filename = None, namespaces = None, preprocessor_func = None):
+def parse_lines_and_handle_imports(ivls_build, basepath, source, compiler_import_cache, filename = None, namespaces = None, preprocessor_func = None):
     '''parses lines into Line objects and imports all files. preprocessor_func does not mean preprocessor_plugins'''
 
     def read_path(basepath, filepath):
@@ -475,7 +475,8 @@ def parse_lines_and_handle_imports(use_ivls, basepath, source, compiler_import_c
     if preprocessor_func:
         source = preprocessor_func(source, namespaces)
 
-    if use_ivls:
+    if ivls_build:
+        print("Adding IVLS importer implicitly...")
         source += '\nimport \"_IVLS/builder.ksp\"'
     lines = parse_lines(source, filename, namespaces)
     new_lines = collections.deque()
@@ -527,7 +528,7 @@ def parse_lines_and_handle_imports(use_ivls, basepath, source, compiler_import_c
                     if preprocessor_func:
                         preproc_s = preprocessor_func(source, namespaces)
 
-                    new_lines.extend(parse_lines_and_handle_imports(use_ivls, basepath, preproc_s, compiler_import_cache, path, namespaces))
+                    new_lines.extend(parse_lines_and_handle_imports(ivls_build, basepath, preproc_s, compiler_import_cache, path, namespaces))
         # non-import line so just add it to result line list:
         else:
             new_lines.append(line)
