@@ -50,11 +50,10 @@ def ivls_pre_analyze(line_obj_list):
     
     return subbed_code
 
-voice_logic_taskfunc_title = 'taskfunc ivls.{}.VoiceLogic(var self, var self_invalid, var user_continue, nenv)'
+voice_logic_taskfunc_title = 'taskfunc ivls.{}.VoiceLogic(var self, var self_invalid, var user_continue, var passed_vo, nenv)'
 voice_logic_taskfunc_pre_on = '''
         declare node_id := NodeEnv[nenv].node_id
         declare thread := Voice[self].thread
-        declare old_self := -1
 
         if NodeEnv[nenv].input_type = ivls.input_type.VOICE_ON
 '''
@@ -68,10 +67,10 @@ voice_logic_taskfunc_post_off = '''
 
 voice_logic_case = '''
 case ivls.node.{0}
-    ivls.{0}.VoiceLogic(self, self_invalid, user_continue, nenv)
+    ivls.{0}.VoiceLogic(self, self_invalid, user_continue, passed_vo, nenv)
 '''
 
-voice_pass_taskfunc_title = 'taskfunc ivls.{}.VoicePass(var self, var user_continue)'
+voice_pass_taskfunc_title = 'taskfunc ivls.{}.VoicePass(var self, var user_continue, var passed_vo)'
 voice_pass_taskfunc_pre_pass = '''
         declare node_id := ivls.flows[Voice[self].flow, Voice[self].stage]
         declare thread := Voice[self].thread
@@ -82,7 +81,7 @@ voice_pass_taskfunc_post_pass = '''
 
 voice_pass_case = '''
 case ivls.node.{0}
-    ivls.{0}.VoicePass(self, user_continue)
+    ivls.{0}.VoicePass(self, user_continue, passed_vo)
 '''
 
 node_ui_switcher = '''
