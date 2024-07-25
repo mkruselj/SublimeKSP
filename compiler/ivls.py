@@ -281,6 +281,26 @@ def parse_node_macros(code_lines, define_cache):
             
             del node_cb[base_node]
 
+    def inject_cb(lines, src_node, cb_name):
+        for node in node_names:
+            if cb_name in node_cb[node] and not node == src_node:
+                for cb_l in node_cb[node][cb_name]:
+                    lines.append(cb_l)
+        
+    # Process node CB injections
+    for node in node_names:
+        for cb in node_cb[node]:
+            new_cb = []
+            for cb_l in node_cb[node][cb]:
+                line = cb_l.command.lstrip()
+                if line.startswith("__RUN_CB__"):
+                    cb_name = line.split('(')[1].split(')')[0]
+                    inject_cb(new_cb, node, cb_name)
+                else:
+                    new_cb.append(cb_l)
+                    
+            node_cb[node][cb] = new_cb               
+
     # Inject Nodes directly in where IVLS commands are found
     pre_assembly_lines = deque()
     voiced_nodes = []
