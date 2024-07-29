@@ -311,8 +311,22 @@ def parse_node_macros(code_lines, define_cache):
             cb_name = line.split('(')[1].split(')')[0]
             for node in node_names:
                 if cb_name in node_cb[node]:
+                    # if cb_name == 'ICB':
+                    #     pre_assembly_lines.append(Line("init_routine_timer := KSP_TIMER", None, None))
+                    
+                    if cb_name == 'ICB':
+                        pre_assembly_lines.append(Line("if(1=1)", None, None))
                     for cb_l in node_cb[node][cb_name]:
                         pre_assembly_lines.append(cb_l)
+                    if cb_name == 'ICB':
+                        pre_assembly_lines.append(Line("end if", None, None))
+                        
+                    # if cb_name == 'ICB':
+                    #     pre_assembly_lines.append(Line("if ((KSP_TIMER - init_routine_timer) / 1000) > 1", None, None))
+                    #     pre_assembly_lines.append(Line("message(\"{} ICB Time (ms): \" & (KSP_TIMER - init_routine_timer) / 1000)".format(node), None, None))
+                    #     pre_assembly_lines.append(Line("init_routine_timer := KSP_TIMER", None, None))
+                    #     pre_assembly_lines.append(Line("end if", None, None))
+                        
         elif line.startswith("__CACHE_PASSES__"):
             for n in node_names:
                 if node_passes[n] == True:
