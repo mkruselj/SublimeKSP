@@ -372,6 +372,7 @@ def parse_lines(s, filename = None, namespaces = None):
         in_string = False
         in_f_string = False
         f_connect = False
+        hyphen_connect = False
         escaping = False
         
         all_args = []
@@ -381,7 +382,7 @@ def parse_lines(s, filename = None, namespaces = None):
         
         for i, c in enumerate(line):
             if record_arg == True:
-                if c == '>' and not escaping:
+                if c == '>' and not escaping and not hyphen_connect:
                     record_arg = False
                     escaping = False
                     all_args.append(arg_content)
@@ -389,30 +390,29 @@ def parse_lines(s, filename = None, namespaces = None):
                     continue
                 else:
                     arg_content += c
-                
+
             if c == 'f' and not in_string:
-                escaping = False
                 f_connect = True
             elif in_string and c == '\\':
                 escaping = True
-                f_connect = False
+            elif in_string and c == '-':
+                hyphen_connect = True
             elif c == "'" and not escaping:
                 in_string = not in_string
                 in_f_string = f_connect and in_string
                 
                 if in_f_string:
                     f_spots.append(i - 1)
-                    
-                escaping = False
-                f_connect = False
             elif in_f_string and not escaping:
                 if c == '<':
                     record_arg = True
-                escaping = False
+            
+            if c != 'f':
                 f_connect = False
-            else:
+            if c != '-':
+                hyphen_connect = False
+            if c != '\\':
                 escaping = False
-                f_connect = False
         
         new_line = line
         deleted = 0
@@ -422,7 +422,7 @@ def parse_lines(s, filename = None, namespaces = None):
             deleted += 1
             
         for a in all_args:
-            new_line = new_line.replace("<{}>".format(a), "\' & {} & \'".format(a.replace('\\>', '>').replace(('\\<', '<'))))
+            new_line = new_line.replace("<{}>".format(a), "\' & {} & \'".format(a.replace('\\>', '>').replace('\\<', '<')))
         
         return new_line
 
