@@ -1,7 +1,9 @@
 {
     "*": {
         "*": [
-            "sublime_lib"
+            "sublime_lib",
+            "pyyaml",
+            "pathlib"
         ]
     }
 }

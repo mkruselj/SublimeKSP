@@ -531,6 +531,8 @@ def parse_lines_and_handle_imports(ivls_build, basepath, source, compiler_import
 
         return out_data
 
+    from ivls_cli_bridge import get_ivls_project_root, get_libs
+
     if preprocessor_func:
         source = preprocessor_func(source, namespaces)
 
@@ -558,12 +560,18 @@ def parse_lines_and_handle_imports(ivls_build, basepath, source, compiler_import
             namespace = m.group('asname')
 
             if basepath:
-                if '_IVLS' in filename and not os.path.isdir(os.path.join(basepath, '_IVLS')):
-                    new_sources = read_path(compiler_path, filename)
-                    print("Saved file, loading internal IVLS.")
-                else:
-                    new_sources = read_path(basepath, filename)
-                    print("Saved file, loading external IVLS.")
+                libs = []
+                project_path = get_ivls_project_root(basepath)
+                if project_path is not None:
+                    libs = get_libs(project_path)
+
+                for l in libs:
+                    if l in filename:
+                        filename = filename.replace(l, 'lib/' + l)
+                        print(filename)
+                
+                new_sources = read_path(basepath, filename)
+                print("Saved file, loading external IVLS.")
             else:
                 print(compiler_path)
                 if '_IVLS' in filename:
