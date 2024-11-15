@@ -68,7 +68,7 @@
         },
         {
             "name": "User function call",
-            "scope": "meta.function-call -function.ksp",
+            "scope": "meta.function-call -function.sksp",
             "foreground": "#95A6BA"
         },
         {
@@ -96,11 +96,6 @@
             "scope": "comment",
             "foreground": "#75715E",
             "font_style": "italic"
-        },
-        {
-            "name": "Parentheses",
-            "scope": "parentheses -begin.source.ksp -end.source.ksp",
-            "foreground": "#E3E3E3"
         }
     ]
 }

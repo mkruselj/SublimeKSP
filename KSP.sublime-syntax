@@ -7,64 +7,64 @@ name: KSP
 file_extensions:
   - ksp
 
-scope: source.ksp
+scope: source.sksp
 
 variables:
-  varchars: '[a-zA-Z0-9_.]'
-  macrotoken: '\#{1}{{varchars}}+\#{1}'
+  varchars: '[\w.]'
 
 contexts:
   main:
     - match: '\{\{'
       comment: Double curly bracket section comment (symbol list only)
       push:
-        - meta_scope: comment.block.source.ksp, section.comment.source.ksp
+        - meta_scope: comment.block.source.sksp, section.comment.source.sksp
         - match: '\}\}'
           pop: true
 
     - match: '\{'
       comment: Curly bracket block comment
       push:
-        - meta_scope: comment.block.source.ksp
+        - meta_scope: comment.block.source.sksp
         - match: '\}'
           pop: true
 
     - match: '\(\*'
       comment: Old Pascal-style block comment
       push:
-        - meta_scope: comment.block.source.ksp
+        - meta_scope: comment.block.source.sksp
         - match: '\*\)'
           pop: true
 
     - match: '/\*'
       comment: C-style block comment
       push:
-        - meta_scope: comment.block.source.ksp
+        - meta_scope: comment.block.source.sksp
         - match: '\*/'
           pop: true
 
     - match: //
       comment: Comment
       push:
-        - meta_scope: comment.source.ksp
+        - meta_scope: comment.source.sksp
         - match: \n|\r
           pop: true
 
-    - match: '\band\b|\bor\b|\bxor\b|\bnot\b|[.]and[.]|[.]or[.]|[.]xor[.]|[.]not[.]|\bmod\b'
-      comment: Operator
-      scope: keyword.operator.source.ksp
+    - match: '\band\b|\bor\b|\bxor\b|\bnot\b|[.]and[.]|[.]or[.]|[.]xor[.]|[.]not[.]'
+      comment: Control flow and boolean operator
+      scope: keyword.operator.source.sksp
 
-    - match: '{{macrotoken}}'
+    - match: '\#{1}{{varchars}}+\#{1}'
       comment: Macro replacement token
-      scope: variable.parameter.source.ksp
+      scope: variable.parameter.source.sksp
 
-    - match: '(on\s+ui_control(s)?)(\s*\(([$%@?]?[a-zA-Z0-9_#.]+)\))?'
-      comment: UI callback
+    - match: '(on\s+ui_control)\s*(\()\s*([$%@?]?[\w#.]+)\s*(\))'
+      comment: Single UI control callback
       captures:
-        0: entity.name.callback.source.ksp
-        1: keyword.other.source.ksp
-        2: keyword.other.source.ksp
-        4: variable.source.ksp
+        0: entity.name.callback.source.sksp
+        1: keyword.other.source.sksp
+        2: punctuation.source.sksp
+        3: variable.source.sksp
+        4: punctuation.source.sksp
 
     - match: '(?x)
                \b(on\s+
@@ -84,20 +84,20 @@ contexts:
                  on_pgs_changed|on_post_init|on_release)
                \b'
       comment: Callback start
-      scope: keyword.other.source.ksp entity.name.callback.source.ksp
+      scope: keyword.other.source.sksp entity.name.callback.source.sksp
 
     - match: \b(end\s+on|end_on)\b
       comment: Callback end
-      scope: keyword.other.source.ksp
+      scope: keyword.other.source.sksp
 
     - match: '\)\s*(on)'
-      comment: Literate On
+      comment: Literate on
       captures:
-        1: keyword.other.source.ksp
+        1: keyword.other.source.sksp
 
     - match: '(\s+-|(?<=[=,{}()\[\]])-)?((0x)[0-9a-fA-F]*|[0-9][0-9a-fA-F]*[hH]|b[01]+|[01]+b|(\d+\.\d+|\.\d+|\d+\.|\d+)([eE][+-]?\d+)?)\b'
       comment: Numerical constant
-      scope: constant.numeric.source.ksp
+      scope: constant.numeric.source.sksp
 
     - match: "[,.()\\[\\]]"
       comment: Punctuation and brackets
@@ -144,69 +144,69 @@ contexts:
               \b' # empty line separates control parameter shorthands from event parameter shorthands!
       comment: Control and event parameter shorthands
       captures:
-        1: operator.source.ksp
-        2: support.variable.source.ksp
+        1: operator.source.sksp
+        2: support.variable.source.sksp
 
     - match: (?!#)\b(if|to|downto|else|for|while|select|case|continue)\b(?!#)
       comment: Control keywords
-      scope: keyword.control.source.ksp
+      scope: keyword.control.source.sksp
 
-    - match: '((function|macro|taskfunc) +([a-zA-Z0-9_.#]+)\s*)\(?'
+    - match: '((function|macro|taskfunc) +([\w.#]+)\s*)\(?'
       comment: Function definition
       captures:
-        1: meta.function.source.ksp
-        2: keyword.other.source.ksp
-        3: entity.name.function.source.ksp
+        1: meta.function.source.sksp
+        2: keyword.other.source.sksp
+        3: entity.name.function.source.sksp
       push:
-        - meta_scope: function.ksp
+        - meta_scope: function.sksp
         - match: \)|$
           pop: true
         - match: 'override'
-          scope: keyword.other.source.ksp
+          scope: keyword.other.source.sksp
         - match: 'out\s+|var\s+'
-          scope: keyword.other.source.ksp
+          scope: keyword.other.source.sksp
           comment: Task function keywords
-        - match: '[a-zA-Z0-9_#.]+'
-          scope: variable.parameter.function.source.ksp
+        - match: '[\w#.]+'
+          scope: variable.parameter.function.source.sksp
         - include: main
 
     - match: '^\s*(const +)({{varchars}}+)'
       comment: Const block definition
-      scope: constblock.ksp
+      scope: constblock.sksp
       captures:
-        0: meta.constblock.source.ksp
-        1: keyword.other.source.ksp
-        2: entity.name.type.source.ksp
+        0: meta.constblock.source.sksp
+        1: keyword.other.source.sksp
+        2: entity.name.type.source.sksp
 
     - match: '^\s*(family +)({{varchars}}+)'
       comment: Family definition
-      scope: family.ksp
+      scope: family.sksp
       captures:
-        0: meta.family.source.ksp
-        1: keyword.other.source.ksp
-        2: entity.name.type.source.ksp
+        0: meta.family.source.sksp
+        1: keyword.other.source.sksp
+        2: entity.name.type.source.sksp
 
     - match: '^\s*(list +)({{varchars}}+)'
       comment: List definition
-      scope: list.ksp
+      scope: list.sksp
       captures:
-        0: meta.list.source.ksp
-        1: keyword.other.source.ksp
-        2: entity.name.type.source.ksp
+        0: meta.list.source.sksp
+        1: keyword.other.source.sksp
+        2: entity.name.type.source.sksp
 
     - match: '^\s*(struct +)({{varchars}}+)'
       comment: Struct definition
-      scope: struct.ksp
+      scope: struct.sksp
       captures:
-        0: meta.struct.source.ksp
-        1: keyword.other.source.ksp
-        2: entity.name.type.source.ksp
+        0: meta.struct.source.sksp
+        1: keyword.other.source.sksp
+        2: entity.name.type.source.sksp
 
     - match: '\b(call) +({{varchars}}+)?'
       comment: Function call using 'call'
       captures:
-        1: keyword.other.source.ksp
-        2: meta.function-call.source.ksp
+        1: keyword.other.source.sksp
+        2: meta.function-call.source.sksp
 
     - match: '(?x)
               (declare|define)\s+
@@ -232,32 +232,32 @@ contexts:
               (({{varchars}}+)?(\#(.+?)\#)?({{varchars}}+)?)\s*\('
       comment: Variable declaration
       captures:
-        1: keyword.other.source.ksp
-        2: keyword.other.source.ksp
-        3: keyword.other.source.ksp
-        4: keyword.other.source.ksp
-        5: keyword.other.source.ksp
-        6: keyword.other.source.ksp
-        8: variable.source.ksp
-        9: operator.source.ksp
-        10: variable.source.ksp
-        11: variable.source.ksp
+        1: keyword.other.source.sksp
+        2: keyword.other.source.sksp
+        3: keyword.other.source.sksp
+        4: keyword.other.source.sksp
+        5: keyword.other.source.sksp
+        6: keyword.other.source.sksp
+        8: variable.source.sksp
+        9: operator.source.sksp
+        10: variable.source.sksp
+        11: variable.source.sksp
       push:
         - match: \)|$
           pop: true
         - include: main
 
-    - match: '(?!#)\b(struct|define|literals|on|(inst)?pers|read|list *|end list|call|step|function|taskfunc|node|vo_field|macro|declare|const|polyphonic|end|local|global|family|import|as|property|override|ui_(label|button|switch|slider|menu|value_edit|waveform|wavetable|knob|table|xy|text_edit|level_meter|file_selector|panel|mouse_area))\b(?!#)'
-      comment: Other keywords
-      scope: keyword.other.source.ksp
+    - match: '(?!#)\b(struct|define|literals|on|(inst)?pers|read|list *|end list|call|step|function|taskfunc|macro|mod|declare|const|polyphonic|end|local|global|family|import|as|property|override|ui_(label|button|switch|slider|menu|value_edit|waveform|wavetable|knob|table|xy|text_edit|level_meter|file_selector|panel|mouse_area))\b(?!#)'
+      comment: Keywords
+      scope: keyword.other.source.sksp
 
     - match: '"(?:[^"\\]|\\.)*"'
       comment: Double-quoted string
-      scope: string.quoted.double.source.ksp
+      scope: string.quoted.double.source.sksp
 
     - match: '''(?:[^''\\]|\\.)*'''
       comment: Single-quoted string
-      scope: string.quoted.single.source.ksp
+      scope: string.quoted.single.source.sksp
 
     - match: '(?x)
       (\$)?
@@ -577,7 +577,7 @@ contexts:
         NI_DND_ITEMS_(ARRAY|AUDIO|MIDI)
       )\b'
       comment: Builtin variable
-      scope: support.variable.source.ksp
+      scope: support.variable.source.sksp
 
     - match: '(?x)
               \b(
@@ -707,29 +707,29 @@ contexts:
                   wait(_async|_ticks)?|watch_(var|array_idx)|
                   zone_slice_(idx_loop_end|idx_loop_start|length|loop_count|start))\b'
       comment: Builtin function with arguments
-      scope: support.function.source.ksp
+      scope: support.function.source.sksp
 
     - match: '({{varchars}}*)\s*(\()'
       comment: Function call
       captures:
-        1: meta.function-call.source.ksp meta.function-name
-        2: meta.function-call.source.ksp punctuation.definition.arguments.begin.source.ksp
+        1: meta.function-call.source.sksp meta.function-name
+        2: meta.function-call.source.sksp punctuation.definition.arguments.begin.source.sksp
       push:
         - match: (\))|$
           captures:
-            1: meta.function-call.source.ksp punctuation.definition.arguments.end.source.ksp
+            1: meta.function-call.source.sksp punctuation.definition.arguments.end.source.sksp
           pop: true
         - include: main
 
-    - match: '(\b|[~?$%!@&]){{varchars}}+|\b\d+[A-Za-z_][A-Za-z0-9_]*\b'
+    - match: '(\b|[~?$%!@&]){{varchars}}+|\b\d+[A-Za-z_]\w*\b'
       comment: Identifier
-      scope: variable.source.ksp
+      scope: variable.source.sksp
 
     - match: '[:+]=|[=][+]|&|<=|>=|<|>|#|=|->|\.\.\.'
       comment: Operator
-      scope: operator.source.ksp
+      scope: operator.source.sksp
 
     - match: "[-+*/]"
       comment: Arithmetic Operator
-      scope: arithmetic.source.ksp
+      scope: arithmetic.source.sksp
 
