@@ -67,7 +67,7 @@
         },
         {
             "name": "User function call",
-            "scope": "meta.function-call -function.ksp",
+            "scope": "meta.function-call -function.sksp",
             "foreground": "#F60"
         },
         {
@@ -98,11 +98,6 @@
         {
             "name": "Punctuation",
             "scope": "punctuation",
-            "foreground": "#888"
-        },
-        {
-            "name": "Parentheses",
-            "scope": "parentheses -begin.source.ksp -end.source.ksp",
             "foreground": "#888"
         }
     ]
