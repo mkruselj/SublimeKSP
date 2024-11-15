@@ -1,0 +1,5 @@
+{
+    "name": "SublimeKSP Light",
+    "type": "light",
+    "tokenColors": "../../KScript Light.tmTheme"
+}
