@@ -1,0 +1,70 @@
+{
+  "name": "sublimeksp-vscode",
+  "displayName": "SublimeKSP for VS Code",
+  "description": "SublimeKSP extension for VS Code",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nojanath/SublimeKSP.git"
+  },
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "sksp",
+        "aliases": [
+          "SublimeKSP",
+          "sksp"
+        ],
+        "extensions": [
+          ".ksp"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "sksp",
+        "scopeName": "source.sksp",
+        "path": "./vscode/syntaxes/sksp.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "sksp",
+        "path": "./vscode/snippets.json"
+      }
+    ],
+    "themes": [
+      {
+        "label": "SublimeKSP Dark",
+        "path": "./vscode/themes/sksp-dark-color-theme.json",
+        "uiTheme": "vs-dark"
+      },
+      {
+        "label": "SublimeKSP Light",
+        "path": "./vscode/themes/sksp-light-color-theme.json",
+        "uiTheme": "vs"
+      },
+      {
+        "label": "SublimeKSP Monokai",
+        "path": "./vscode/themes/sksp-monokai-color-theme.json",
+        "uiTheme": "vs-dark"
+      }
+    ]
+  },
+  "devDependencies": {
+    "@vscode/vsce": "3.2.1"
+  },
+  "scripts": {
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "convert-snippets-to-vscode": "^1.0.2"
+  }
+}
