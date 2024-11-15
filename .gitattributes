@@ -1,0 +1,15 @@
+# npm
+node_modules/ export-ignore
+
+# VS Code extension files
+.vscode/ export-ignore
+vscode/ export-ignore
+.vscodeignore export-ignore
+language-configuration.json export-ignore
+package.json export-ignore
+package-lock.json export-ignore
+CHANGELOG.md export-ignore
+
+# SublimeKSP compiler test runners
+Run Tests.bat export-ignore
+Run Tests.sh export-ignore

@@ -1,0 +1,109 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "SublimeKSP",
+    "patterns": [
+        {
+            "name": "comment.block.source.sksp",
+            "comment": "Curly bracket block comment",
+            "begin": "\\{",
+            "end": "\\}"
+        },
+        {
+            "name": "comment.block.source.sksp",
+            "comment": "Old Pascal-style block comment",
+            "begin": "\\(\\*",
+            "end": "\\*\\)"
+        },
+        {
+            "name": "comment.block.source.sksp",
+            "comment": "C-style block comment",
+            "begin": "/\\*",
+            "end": "\\*/"
+        },
+        {
+            "name": "comment.line.double-slash.source.sksp",
+            "comment": "Single line comment",
+            "begin": "//",
+            "end": "$"
+        },
+        {
+            "name": "keyword.source.sksp",
+            "comment": "Control flow and boolean operator",
+            "match": "\\band\\b|\\bor\\b|\\bxor\\b|\\bnot\\b|[.]and[.]|[.]or[.]|[.]xor[.]|[.]not[.]"
+        },
+        {
+            "include": "#macrotoken",
+            "comment": "Macro replacement token"
+        },
+        {
+            "name": "keyword.callback.source.sksp",
+            "match": "\\b(?<=on\\s+)(async_complete|controller|init|listener|midi_in|note(_controller)?|(n)?rpn|release|persistence_changed|(_)?pgs_changed|poly_at|ui_(controls|update))\\b",
+            "comment": "Callback start"
+        },
+        {
+            "begin": "(?<=on\\s+)(ui_control)\\s*(\\()",
+            "end": "\\)",
+            "comment": "Single UI control callback start",
+            "beginCaptures":
+            {
+                "1": { "name": "keyword.callback.source.sksp" },
+                "2": { "name": "punctuation.definition.name-begin.source.sksp" }
+            },
+            "endCaptures":
+            {
+                "0": { "name": "punctuation.definition.name-begin.source.sksp" }
+            },
+            "patterns":
+            [
+                { "include": "#macrotoken" },
+                {
+                    "name": "variable.name.source.sksp",
+                    "match": "[$%@?]?[\\w.]+"
+                }
+            ]
+        },
+        {
+            "name": "constant.numeric.source.sksp",
+            "comment": "Numerical constant",
+            "match": "(\\s+-|(?<=[=,{}()\\[\\]])-)?((0x)[0-9a-fA-F]*|[0-9][0-9a-fA-F]*[hH]|b[01]+|[01]+b|(\\d+\\.\\d+|\\.\\d+|\\d+\\.|\\d+)([eE][+-]?\\d+)?)\\b"
+        },
+        {
+            "match": "[,.()\\[\\]]",
+            "comment": "Punctuation and brackets",
+            "scope": "punctuation.source.sksp"
+        },
+        {
+            "name": "keyword.other.source.sksp",
+            "match": "(?!#)\\b(struct|define|literals|on|(inst)?pers|read|list *|end list|call|if|(down)?to|else|for|while|select|case|continue|step|function|taskfunc|macro|mod|declare|const|polyphonic|end|local|global|family|import|as|property|override|ui_(label|button|switch|slider|menu|value_edit|waveform|wavetable|knob|table|xy|text_edit|level_meter|file_selector|panel|mouse_area))\\b(?!#)",
+            "comment": "Keywords"
+        },
+        {
+            "name": "string.quoted.double.source.sksp",
+            "comment": "Double-quoted string",
+            "match": "\"(?:[^\"\\\\]|\\\\.)*\""
+        },
+        {
+            "name": "string.quoted.single.source.sksp",
+            "comment": "Single-quoted string",
+            "match": "'(?:[^'\\\\]|\\\\.)*'"
+        },
+        {
+            "name": "variable.source.sksp",
+            "comment": "Identifier",
+            "match": "(\\b|[~?$%!@&])[\\w.]+|\\b\\d+[A-Za-z_][\\w]*\\b"
+        },
+        {
+            "name": "operator.source.sksp",
+            "comment": "Operator",
+            "match": "[:+]=|[=][+]|[+|-|*|/]|&|<=|>=|<|>|#|=|->|\\.\\.\\."
+        }
+    ],
+    "repository": {
+        "macrotoken" : {
+            "name": "variable.parameter.source.sksp",
+            "comment": "Macro replacement token",
+            "match": "#[\\w.]+#"
+        }
+    },
+    "scopeName": "source.sksp"
+}

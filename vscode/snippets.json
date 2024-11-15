@@ -1,0 +1,434 @@
+{
+	"on": {
+		"prefix": "on",
+		"body": "\non ${1:callback}\n\t${0}\nend on\n",
+		"description": "callback",
+		"scope": "source.sksp"
+	},
+	"car": {
+		"prefix": "car",
+		"body": "\nconst ${1:name}\n    ${2:entry}\nend const\n",
+		"description": "const array",
+		"scope": "source.sksp"
+	},
+	"const": {
+		"prefix": "const",
+		"body": "declare const ${1:name}",
+		"description": "constant",
+		"scope": "source.sksp"
+	},
+	"family": {
+		"prefix": "family",
+		"body": "\nfamily ${1:name}\n\t${0}\nend family\n",
+		"description": "family",
+		"scope": "source.sksp"
+	},
+	"for": {
+		"prefix": "for",
+		"body": "\nfor ${1:i} := ${2:0} to ${3:max}\n\t${0}\nend for\n",
+		"description": "for loop",
+		"scope": "source.sksp"
+	},
+	"function": {
+		"prefix": "function",
+		"body": "\nfunction ${1:name}\n\t${0}\nend function\n",
+		"description": "function",
+		"scope": "source.sksp"
+	},
+	"global": {
+		"prefix": "global",
+		"body": "declare global ${1:name}",
+		"description": "global variable",
+		"scope": "source.sksp"
+	},
+	"iei": {
+		"prefix": "iei",
+		"body": "\nif ${1:condition}\n\t${2}\nelse if ${3:condition}\n\t${4}\nend if\n",
+		"description": "if else if",
+		"scope": "source.sksp"
+	},
+	"ife": {
+		"prefix": "ife",
+		"body": "\nif ${1:condition}\n\t${2}\nelse\n\t${3}\nend if\n",
+		"description": "if else",
+		"scope": "source.sksp"
+	},
+	"if": {
+		"prefix": "if",
+		"body": "\nif ${1:condition}\n\t${0}\nend if\n",
+		"description": "if",
+		"scope": "source.sksp"
+	},
+	"iterate_macro": {
+		"prefix": "iterate_macro",
+		"body": "\niterate_macro(${1:macro}) := ${2:0} to ${3:max}\n",
+		"description": "iterate macro",
+		"scope": "source.sksp"
+	},
+	"literate_macro": {
+		"prefix": "literate_macro",
+		"body": "\nliterate_macro(${1:macro}) on ${2:literals}\n",
+		"description": "literate macro",
+		"scope": "source.sksp"
+	},
+	"local": {
+		"prefix": "local",
+		"body": "declare local ${1:name}",
+		"description": "local variable",
+		"scope": "source.sksp"
+	},
+	"macro": {
+		"prefix": "macro",
+		"body": "\nmacro ${1:name}\n\t${0}\nend macro\n",
+		"description": "macro",
+		"scope": "source.sksp"
+	},
+	"acc": {
+		"prefix": "acc",
+		"body": "\non async_complete\n\t${0}\nend on\n",
+		"description": "async callback",
+		"scope": "source.sksp"
+	},
+	"ccb": {
+		"prefix": "ccb",
+		"body": "\non controller\n\t${0}\nend on\n",
+		"description": "controller callback",
+		"scope": "source.sksp"
+	},
+	"icb": {
+		"prefix": "icb",
+		"body": "\non init\n\t${0}\nend on\n",
+		"description": "init callback",
+		"scope": "source.sksp"
+	},
+	"lcb": {
+		"prefix": "lcb",
+		"body": "\non listener\n\tselect NI_SIGNAL_TYPE\n\t\tcase NI_SIGNAL_TRANSP_START\n\t\t\t${1}\n\t\tcase NI_SIGNAL_TRANSP_STOP\n\t\t\t${2}\n\t\tcase NI_SIGNAL_TIMER_BEAT\n\t\t\t${3}\n\t\tcase NI_SIGNAL_TIMER_MS\n\t\t\t${4}\n\tend select\nend on\n",
+		"description": "listener callback",
+		"scope": "source.sksp"
+	},
+	"midi": {
+		"prefix": "midi",
+		"body": "\non midi_in\n\t${0}\nend on\n",
+		"description": "MIDI in callback",
+		"scope": "source.sksp"
+	},
+	"ncb": {
+		"prefix": "ncb",
+		"body": "\non note\n\t${0}\nend on\n",
+		"description": "note callback",
+		"scope": "source.sksp"
+	},
+	"nccb": {
+		"prefix": "nccb",
+		"body": "\non note_controller\n\t${0}\nend on\n",
+		"description": "note controller callback",
+		"scope": "source.sksp"
+	},
+	"nrpn": {
+		"prefix": "nrpn",
+		"body": "\non nrpn\n\t${0}\nend on\n",
+		"description": "NRPN callback",
+		"scope": "source.sksp"
+	},
+	"pcc": {
+		"prefix": "pcc",
+		"body": "\non persistence_changed\n\t${0}\nend on\n",
+		"description": "persistence changed callback",
+		"scope": "source.sksp"
+	},
+	"pgsc": {
+		"prefix": "pgsc",
+		"body": "\non pgs_changed\n\t${0}\nend on\n",
+		"description": "PGS callback",
+		"scope": "source.sksp"
+	},
+	"pat": {
+		"prefix": "pat",
+		"body": "\non poly_at\n\t${0}\nend on\n",
+		"description": "poly AT callback",
+		"scope": "source.sksp"
+	},
+	"rcb": {
+		"prefix": "rcb",
+		"body": "\non release\n\t${0}\nend on\n",
+		"description": "release callback",
+		"scope": "source.sksp"
+	},
+	"rpn": {
+		"prefix": "rpn",
+		"body": "\non rpn\n\t${0}\nend on\n",
+		"description": "RPN callback",
+		"scope": "source.sksp"
+	},
+	"uicb": {
+		"prefix": "uicb",
+		"body": "\non ui_control (${1:control_name})\n\t${0}\nend on\n",
+		"description": "single UI control callback",
+		"scope": "source.sksp"
+	},
+	"uicbs": {
+		"prefix": "uicbs",
+		"body": "\non ui_controls\n\t${0}\nend on\n",
+		"description": "global UI controls callback",
+		"scope": "source.sksp"
+	},
+	"upd": {
+		"prefix": "upd",
+		"body": "\non ui_update\n\t${0}\nend on\n",
+		"description": "UI update callback",
+		"scope": "source.sksp"
+	},
+	"polyphonic": {
+		"prefix": "polyphonic",
+		"body": "declare polyphonic ${1:name}",
+		"description": "polyphonic",
+		"scope": "source.sksp"
+	},
+	"pwa": {
+		"prefix": "pwa",
+		"body": "{ #pragma compile_with add_compile_date }",
+		"description": "pragma compile with add compile date",
+		"scope": "source.sksp"
+	},
+	"pwcc": {
+		"prefix": "pwcc",
+		"body": "{ #pragma compile_with combine_callbacks }",
+		"description": "pragma compile with combine callbacks",
+		"scope": "source.sksp"
+	},
+	"pwcv": {
+		"prefix": "pwcv",
+		"body": "{ #pragma compile_with compact_variables }",
+		"description": "pragma compile with compact variables",
+		"scope": "source.sksp"
+	},
+	"pwe": {
+		"prefix": "pwe",
+		"body": "{ #pragma compile_with extra_syntax_checks }",
+		"description": "pragma compile with extra syntax checks",
+		"scope": "source.sksp"
+	},
+	"pwo": {
+		"prefix": "pwo",
+		"body": "{ #pragma compile_with optimize_code }",
+		"description": "pragma compile with optimize code",
+		"scope": "source.sksp"
+	},
+	"pwrw": {
+		"prefix": "pwrw",
+		"body": "{ #pragma compile_with remove_whitespace }",
+		"description": "pragma compile with remove whitespace",
+		"scope": "source.sksp"
+	},
+	"pws": {
+		"prefix": "pws",
+		"body": "{ #pragma compile_with sanitize_exit_command }",
+		"description": "pragma compile with sanitize exit",
+		"scope": "source.sksp"
+	},
+	"poa": {
+		"prefix": "poa",
+		"body": "{ #pragma compile_without add_compile_date }",
+		"description": "pragma compile without add compile date",
+		"scope": "source.sksp"
+	},
+	"pocc": {
+		"prefix": "pocc",
+		"body": "{ #pragma compile_without combine_callbacks }",
+		"description": "pragma compile without combine callbacks",
+		"scope": "source.sksp"
+	},
+	"pocv": {
+		"prefix": "pocv",
+		"body": "{ #pragma compile_without compact_variables }",
+		"description": "pragma compile without compact variables",
+		"scope": "source.sksp"
+	},
+	"poe": {
+		"prefix": "poe",
+		"body": "{ #pragma compile_without extra_syntax_checks }",
+		"description": "pragma compile without extra syntax checks",
+		"scope": "source.sksp"
+	},
+	"poo": {
+		"prefix": "poo",
+		"body": "{ #pragma compile_without optimize_code }",
+		"description": "pragma compile without optimize code",
+		"scope": "source.sksp"
+	},
+	"porw": {
+		"prefix": "porw",
+		"body": "{ #pragma compile_without remove_whitespace }",
+		"description": "pragma compile without remove whitespace",
+		"scope": "source.sksp"
+	},
+	"pos": {
+		"prefix": "pos",
+		"body": "{ #pragma compile_without sanitize_exit_command }",
+		"description": "pragma compile without sanitize exit",
+		"scope": "source.sksp"
+	},
+	"ppn": {
+		"prefix": "ppn",
+		"body": "{ #pragma preserve_names ${1:name} }",
+		"description": "pragma preserve names",
+		"scope": "source.sksp"
+	},
+	"psc": {
+		"prefix": "psc",
+		"body": "{ #pragma save_compiled_source ${1:path} }",
+		"description": "pragma save compiled source",
+		"scope": "source.sksp"
+	},
+	"property": {
+		"prefix": "property",
+		"body": "\nproperty ${1:name}\n\tfunction get -> result\n\t\tresult := ${2:expression}\n\tend function\n\n\tfunction set(value)\n\t\t${3:expression} := value\n\tend function\nend property\n",
+		"description": "property",
+		"scope": "source.sksp"
+	},
+	"select": {
+		"prefix": "select",
+		"body": "\nselect ${1:value}\n\tcase ${2:constant}\n\t\t${3:statements}\n\tcase ${4:constant}\n\t\t${5:statements}\nend select\n",
+		"description": "select",
+		"scope": "source.sksp"
+	},
+	"START": {
+		"prefix": "START",
+		"body": "\nSTART_INC (${1:counter}, ${2:start}, ${3:increment})\n\t${4:statements}\nEND_INC\n",
+		"description": "START_INC",
+		"scope": "source.sksp"
+	},
+	"struct": {
+		"prefix": "struct",
+		"body": "\nstruct ${0:name}\n\t${1}\nend struct\n",
+		"description": "struct block",
+		"scope": "source.sksp"
+	},
+	"taskfunc": {
+		"prefix": "taskfunc",
+		"body": "\ntaskfunc ${1:name}\n\t${0}\nend taskfunc\n",
+		"description": "taskfunc",
+		"scope": "source.sksp"
+	},
+	"ui_button": {
+		"prefix": "ui_button",
+		"body": "declare ui_button ${1:name}",
+		"description": "ui_button",
+		"scope": "source.sksp"
+	},
+	"ui_file_selector": {
+		"prefix": "ui_file_selector",
+		"body": "declare ui_file_selector ${1:name}",
+		"description": "ui_file_selector",
+		"scope": "source.sksp"
+	},
+	"ui_knob": {
+		"prefix": "ui_knob",
+		"body": "declare ui_knob ${1:name} (${2:min}, ${3:max}, ${4:display_ratio})",
+		"description": "ui_knob",
+		"scope": "source.sksp"
+	},
+	"ui_label": {
+		"prefix": "ui_label",
+		"body": "declare ui_label ${1:name} (${2:width}, ${3:height})",
+		"description": "ui_label",
+		"scope": "source.sksp"
+	},
+	"ui_level_meter": {
+		"prefix": "ui_level_meter",
+		"body": "declare ui_level_meter ${1:name}",
+		"description": "ui_level_meter",
+		"scope": "source.sksp"
+	},
+	"ui_menu": {
+		"prefix": "ui_menu",
+		"body": "declare ui_menu ${1:name}",
+		"description": "ui_menu",
+		"scope": "source.sksp"
+	},
+	"ui_mouse_area": {
+		"prefix": "ui_mouse_area",
+		"body": "declare ui_mouse_area ${1:name}",
+		"description": "ui_mouse_area",
+		"scope": "source.sksp"
+	},
+	"ui_panel": {
+		"prefix": "ui_panel",
+		"body": "declare ui_panel ${1:name}",
+		"description": "ui_panel",
+		"scope": "source.sksp"
+	},
+	"ui_slider": {
+		"prefix": "ui_slider",
+		"body": "declare ui_slider ${1:name} (${2:min}, ${3:max})",
+		"description": "ui_slider",
+		"scope": "source.sksp"
+	},
+	"ui_switch": {
+		"prefix": "ui_switch",
+		"body": "declare ui_switch ${1:name}",
+		"description": "ui_switch",
+		"scope": "source.sksp"
+	},
+	"ui_table": {
+		"prefix": "ui_table",
+		"body": "declare ui_table ${1:name}[${2:columns}](${3:width}, ${4:height}, ${5:value})",
+		"description": "ui_table",
+		"scope": "source.sksp"
+	},
+	"ui_text_edit": {
+		"prefix": "ui_text_edit",
+		"body": "declare ui_text_edit @${1:name}",
+		"description": "ui_text_edit",
+		"scope": "source.sksp"
+	},
+	"ui_value_edit": {
+		"prefix": "ui_value_edit",
+		"body": "declare ui_value_edit ${1:name} (${2:min}, ${3:max}, ${4:display_ratio})",
+		"description": "ui_value_edit",
+		"scope": "source.sksp"
+	},
+	"ui_wf": {
+		"prefix": "ui_wf",
+		"body": "declare ui_waveform ${1:name} (${2:width}, ${3:height})",
+		"description": "ui_waveform",
+		"scope": "source.sksp"
+	},
+	"ui_wt": {
+		"prefix": "ui_wt",
+		"body": "declare ui_wavetable ${1:name}",
+		"description": "ui_wavetable",
+		"scope": "source.sksp"
+	},
+	"ui_xy": {
+		"prefix": "ui_xy",
+		"body": "declare ui_xy ${1:name}[${2:elements}]",
+		"description": "ui_xy",
+		"scope": "source.sksp"
+	},
+	"USE": {
+		"prefix": "USE",
+		"body": "\nUSE_CODE_IF(${1:condition})\n\t${2:code}\nEND_USE_CODE\n",
+		"description": "USE_CODE_IF",
+		"scope": "source.sksp"
+	},
+	"USEN": {
+		"prefix": "USEN",
+		"body": "\nUSE_CODE_IF_NOT(${1:condition})\n\t${2:code}\nEND_USE_CODE\n",
+		"description": "USE_CODE_IF_NOT",
+		"scope": "source.sksp"
+	},
+	"while": {
+		"prefix": "while",
+		"body": "\nwhile (${1:condition})\n\t${2}\nend while\n",
+		"description": "while loop",
+		"scope": "source.sksp"
+	},
+	"whilec": {
+		"prefix": "whilec",
+		"body": "\n${1:i} := 0\nwhile (${1:i} < ${2:max})\n\t${3}\n\tinc(${1:i})\nend while\n",
+		"description": "while with counter",
+		"scope": "source.sksp"
+	}
+}
