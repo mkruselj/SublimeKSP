@@ -99,11 +99,6 @@
             "name": "Punctuation",
             "scope": "punctuation",
             "foreground": "#888"
-        },
-        {
-            "name": "Parentheses",
-            "scope": "parentheses -begin.source.sksp -end.source.sksp",
-            "foreground": "#888"
         }
     ]
 }
