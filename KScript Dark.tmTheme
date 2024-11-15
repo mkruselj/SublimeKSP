@@ -148,7 +148,7 @@
 			<key>name</key>
 			<string>User function call</string>
 			<key>scope</key>
-			<string>meta.function-call -function.ksp</string>
+			<string>meta.function-call -function.sksp</string>
 			<key>settings</key>
 			<dict>
 				<key>fontStyle</key>
@@ -221,17 +221,6 @@
 			<string>Punctuation</string>
 			<key>scope</key>
 			<string>punctuation</string>
-			<key>settings</key>
-			<dict>
-				<key>foreground</key>
-				<string>#888</string>
-			</dict>
-		</dict>
-		<dict>
-			<key>name</key>
-			<string>Parentheses</string>
-			<key>scope</key>
-			<string>parentheses -begin.source.ksp -end.source.ksp</string>
 			<key>settings</key>
 			<dict>
 				<key>foreground</key>
