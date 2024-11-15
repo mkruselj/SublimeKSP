@@ -1,18 +1,19 @@
 # SublimeKSP
 
-A Sublime Text 3/4 plugin for working with and compiling KSP (Kontakt Script Processor) code.
+A Sublime Text 3/4 and Visual Studio Code plugin for working with and compiling KSP (Kontakt Script Processor) code.
 
 ### Changes
 This fork is based on [Nils Liberg's official SublimeKSP plugin, v1.11](http://nilsliberg.se/ksp/), and supports all Kontakt versions.
 However, there are a number of additions and changes:
 
 * Available in Package Control, which supports automatic updates
+* Available in Visual Studio Marketplace, which supports automatic updates
 * Updates to the syntax highlighting
 * Support for Creator Tools GUI Designer
 * Numerous additions to the preprocessor, allowing for UI arrays, new macro types and much more
 * See the [SublimeKSP Added Features](https://github.com/nojanath/SublimeKSP/wiki/SublimeKSP-Added-Features) section of the [Wiki](https://github.com/nojanath/SublimeKSP/wiki) for more information
 
-### Installation
+### Installation (Sublime Text)
 
 * Install [Package Control](https://packagecontrol.io/installation)
 * After installing Package Control and restarting Sublime Text:
@@ -22,19 +23,26 @@ However, there are a number of additions and changes:
   * Press <kbd>Enter</kbd> to install
   * Restart Sublime Text
 
-### Manual Installation
+### Installation (Visual Studio Code)
+
+* Click the Extensions tab
+* Type "SublimeKSP" in the search bar
+* Click the "Install" button of the search result
+* Done!
+
+### Manual Installation (Sublime Text)
 
 To use features of SublimeKSP before official package releases:
 
  * If you already had SublimeKSP installed via Package Control, uninstall it before continuing further!
- * Locate Sublime Text's `Packages`folder by selecting `Preferences > Browse Packages` from the main menu
+ * Locate Sublime Text's `Packages` folder by selecting `Preferences > Browse Packages` from the main menu
  * Clone SublimeKSP repository into this folder via Git (`git clone https://github.com/nojanath/SublimeKSP.git "KSP (Kontakt Script Processor"`)
  * After pulling the latest changes (`git pull`), reload Sublime Text
  * If you wish to pull in latest changes without restarting Sublime Text, we recommend installing [Automatic​Package​Reloader](https://packagecontrol.io/packages/AutomaticPackageReloader)
 
 ### Running From Command Line
 
-SublimeKSP compiler can also be ran from command line, by simply executing `ksp_compiler.py` with the appropriate source (and optionally output) file path(s),
+SublimeKSP compiler can also be executed from command line, by simply running `ksp_compiler.py` with the appropriate source (and optionally output) file path(s),
 along with optional compiler switches.
 For this, you need to use the manual installation of SublimeKSP, in order to have direct access to `ksp_compiler.py` file. To execute a compilation of a file,
 it is as simple as typing:
@@ -43,7 +51,7 @@ it is as simple as typing:
 > python ksp_compiler.py "<source-file-path>"
 ```
 
-However, various compiler options from SublimeKSP's Tools menu are also available. All of them are set to false if not used,
+Various compiler options from SublimeKSP's Tools menu are also available. All of them are set to false if not used,
 and by including them in the command line, they are set to true:
 
 ```
@@ -69,9 +77,9 @@ optional arguments:
 ```
 
 ### Updates
-* Updates to the plugin will be automatically installed via Package Control.
-* Pull requests are welcome for bugfixes/updates/changes. If you aren't familiar
-with pull requests, just open an issue [here](https://github.com/nojanath/SublimeKSP/issues).
+* Updates to the plugin will be automatically installed via Package Control or Visual Studio Marketplace
+* Pull requests are welcome for bugfixes/updates/changes. If you aren't familiar with pull requests,
+just open an issue [here](https://github.com/nojanath/SublimeKSP/issues).
 
 ### Documentation
 See the [Wiki](https://github.com/nojanath/SublimeKSP/wiki) on GitHub.
