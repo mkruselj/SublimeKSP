@@ -1,0 +1,26 @@
+# repository, npm and VS Code settings files
+.github/**
+.vscode/**
+.vscode-test/**
+node_modules/**
+.gitignore
+
+# Sublime Text extension files
+*.sublime-color-scheme
+*.sublime-commands
+*.sublime-keymap
+*.sublime-menu
+*.sublime-settings
+*.sublime-syntax
+*.tmPreferences
+file_icon/**
+messages/**
+snippets/*.sublime-snippet
+sounds/**
+dependencies.json
+messages.json
+ksp_plugin.py
+
+# SublimeKSP compiler test runners
+Run Tests.bat
+Run Tests.sh
