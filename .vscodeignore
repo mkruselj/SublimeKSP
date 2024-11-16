@@ -21,6 +21,7 @@ dependencies.json
 messages.json
 ksp_plugin.py
 
-# SublimeKSP compiler test runners
-Run Tests.bat
-Run Tests.sh
+# SublimeKSP compiler test runners and VS Code extension build script
+run-tests.bat
+run-tests.sh
+build-vsix.sh
