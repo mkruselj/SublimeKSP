@@ -1,6 +1,5 @@
 <snippet>
-    <content><![CDATA[
-on pgs_changed
+    <content><![CDATA[on pgs_changed
 	${0}
 end on
 ]]></content>

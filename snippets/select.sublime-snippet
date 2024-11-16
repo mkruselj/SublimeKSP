@@ -1,6 +1,5 @@
 <snippet>
-	<content><![CDATA[
-select ${1:value}
+	<content><![CDATA[select ${1:value}
 	case ${2:constant}
 		${3:statements}
 	case ${4:constant}

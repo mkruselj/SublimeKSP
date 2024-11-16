@@ -1,6 +1,5 @@
 <snippet>
-	<content><![CDATA[
-on async_complete
+	<content><![CDATA[on async_complete
 	${0}
 end on
 ]]></content>

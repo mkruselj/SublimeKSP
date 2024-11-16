@@ -1,6 +1,5 @@
 <snippet>
-    <content><![CDATA[
-const ${1:name}
+    <content><![CDATA[const ${1:name}
     ${2:entry}
 end const
 ]]></content>

@@ -1,6 +1,5 @@
 <snippet>
-	<content><![CDATA[
-START_INC (${1:counter}, ${2:start}, ${3:increment})
+	<content><![CDATA[START_INC (${1:counter}, ${2:start}, ${3:increment})
 	${4:statements}
 END_INC
 ]]></content>

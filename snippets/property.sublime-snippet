@@ -1,6 +1,5 @@
 <snippet>
-	<content><![CDATA[
-property ${1:name}
+	<content><![CDATA[property ${1:name}
 	function get -> result
 		result := ${2:expression}
 	end function

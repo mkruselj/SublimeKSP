@@ -1,6 +1,5 @@
 <snippet>
-    <content><![CDATA[
-taskfunc ${1:name}
+    <content><![CDATA[taskfunc ${1:name}
 	${0}
 end taskfunc
 ]]></content>

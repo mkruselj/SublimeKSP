@@ -1,6 +1,5 @@
 <snippet>
-	<content><![CDATA[
-on release
+	<content><![CDATA[on release
 	${0}
 end on
 ]]></content>

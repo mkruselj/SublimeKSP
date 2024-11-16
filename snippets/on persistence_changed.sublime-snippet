@@ -1,6 +1,5 @@
 <snippet>
-	<content><![CDATA[
-on persistence_changed
+	<content><![CDATA[on persistence_changed
 	${0}
 end on
 ]]></content>
