@@ -5,11 +5,12 @@ node_modules/ export-ignore
 .vscode/ export-ignore
 vscode/ export-ignore
 .vscodeignore export-ignore
+build-vsix.sh export-ignore
 language-configuration.json export-ignore
 package.json export-ignore
 package-lock.json export-ignore
 CHANGELOG.md export-ignore
 
 # SublimeKSP compiler test runners
-Run Tests.bat export-ignore
-Run Tests.sh export-ignore
+run-tests.bat export-ignore
+run-tests.sh export-ignore
