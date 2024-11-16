@@ -1,6 +1,5 @@
 <snippet>
-	<content><![CDATA[
-on ui_update
+	<content><![CDATA[on ui_update
 	${0}
 end on
 ]]></content>
