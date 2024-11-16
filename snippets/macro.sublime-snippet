@@ -1,6 +1,5 @@
 <snippet>
-    <content><![CDATA[
-macro ${1:name}
+    <content><![CDATA[macro ${1:name}
 	${0}
 end macro
 ]]></content>
