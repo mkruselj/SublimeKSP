@@ -1,6 +1,5 @@
 <snippet>
-    <content><![CDATA[
-struct ${0:name}
+    <content><![CDATA[struct ${0:name}
 	${1}
 end struct
 ]]></content>

@@ -1,6 +1,5 @@
 <snippet>
-    <content><![CDATA[
-on nrpn
+    <content><![CDATA[on nrpn
 	${0}
 end on
 ]]></content>
