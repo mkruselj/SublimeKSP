@@ -63,8 +63,5 @@
   },
   "scripts": {
     "package": "vsce package"
-  },
-  "dependencies": {
-    "convert-snippets-to-vscode": "^1.0.2"
   }
 }
