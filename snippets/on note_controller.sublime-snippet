@@ -1,6 +1,5 @@
 <snippet>
-	<content><![CDATA[
-on note_controller
+	<content><![CDATA[on note_controller
 	${0}
 end on
 ]]></content>

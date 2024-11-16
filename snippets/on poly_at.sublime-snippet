@@ -1,6 +1,5 @@
 <snippet>
-	<content><![CDATA[
-on poly_at
+	<content><![CDATA[on poly_at
 	${0}
 end on
 ]]></content>

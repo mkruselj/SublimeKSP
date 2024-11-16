@@ -1,6 +1,5 @@
 <snippet>
-    <content><![CDATA[
-on ${1:callback}
+    <content><![CDATA[on ${1:callback}
 	${0}
 end on
 ]]></content>

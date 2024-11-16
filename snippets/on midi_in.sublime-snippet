@@ -1,6 +1,5 @@
 <snippet>
-    <content><![CDATA[
-on midi_in
+    <content><![CDATA[on midi_in
 	${0}
 end on
 ]]></content>
