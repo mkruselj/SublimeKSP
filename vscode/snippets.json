@@ -1,13 +1,13 @@
 {
 	"on": {
 		"prefix": "on",
-		"body": "\non ${1:callback}\n\t${0}\nend on\n",
+		"body": "on ${1:callback}\n\t${0}\nend on\n",
 		"description": "callback",
 		"scope": "source.sksp"
 	},
 	"car": {
 		"prefix": "car",
-		"body": "\nconst ${1:name}\n    ${2:entry}\nend const\n",
+		"body": "const ${1:name}\n    ${2:entry}\nend const\n",
 		"description": "const array",
 		"scope": "source.sksp"
 	},
@@ -19,19 +19,19 @@
 	},
 	"family": {
 		"prefix": "family",
-		"body": "\nfamily ${1:name}\n\t${0}\nend family\n",
+		"body": "family ${1:name}\n\t${0}\nend family\n",
 		"description": "family",
 		"scope": "source.sksp"
 	},
 	"for": {
 		"prefix": "for",
-		"body": "\nfor ${1:i} := ${2:0} to ${3:max}\n\t${0}\nend for\n",
+		"body": "for ${1:i} := ${2:0} to ${3:max}\n\t${0}\nend for\n",
 		"description": "for loop",
 		"scope": "source.sksp"
 	},
 	"function": {
 		"prefix": "function",
-		"body": "\nfunction ${1:name}\n\t${0}\nend function\n",
+		"body": "function ${1:name}\n\t${0}\nend function\n",
 		"description": "function",
 		"scope": "source.sksp"
 	},
@@ -43,31 +43,31 @@
 	},
 	"iei": {
 		"prefix": "iei",
-		"body": "\nif ${1:condition}\n\t${2}\nelse if ${3:condition}\n\t${4}\nend if\n",
+		"body": "if ${1:condition}\n\t${2}\nelse if ${3:condition}\n\t${4}\nend if\n",
 		"description": "if else if",
 		"scope": "source.sksp"
 	},
 	"ife": {
 		"prefix": "ife",
-		"body": "\nif ${1:condition}\n\t${2}\nelse\n\t${3}\nend if\n",
+		"body": "if ${1:condition}\n\t${2}\nelse\n\t${3}\nend if\n",
 		"description": "if else",
 		"scope": "source.sksp"
 	},
 	"if": {
 		"prefix": "if",
-		"body": "\nif ${1:condition}\n\t${0}\nend if\n",
+		"body": "if ${1:condition}\n\t${0}\nend if\n",
 		"description": "if",
 		"scope": "source.sksp"
 	},
 	"iterate_macro": {
 		"prefix": "iterate_macro",
-		"body": "\niterate_macro(${1:macro}) := ${2:0} to ${3:max}\n",
+		"body": "iterate_macro(${1:macro}) := ${2:0} to ${3:max}\n",
 		"description": "iterate macro",
 		"scope": "source.sksp"
 	},
 	"literate_macro": {
 		"prefix": "literate_macro",
-		"body": "\nliterate_macro(${1:macro}) on ${2:literals}\n",
+		"body": "literate_macro(${1:macro}) on ${2:literals}\n",
 		"description": "literate macro",
 		"scope": "source.sksp"
 	},
@@ -79,103 +79,103 @@
 	},
 	"macro": {
 		"prefix": "macro",
-		"body": "\nmacro ${1:name}\n\t${0}\nend macro\n",
+		"body": "macro ${1:name}\n\t${0}\nend macro\n",
 		"description": "macro",
 		"scope": "source.sksp"
 	},
 	"acc": {
 		"prefix": "acc",
-		"body": "\non async_complete\n\t${0}\nend on\n",
+		"body": "on async_complete\n\t${0}\nend on\n",
 		"description": "async callback",
 		"scope": "source.sksp"
 	},
 	"ccb": {
 		"prefix": "ccb",
-		"body": "\non controller\n\t${0}\nend on\n",
+		"body": "on controller\n\t${0}\nend on\n",
 		"description": "controller callback",
 		"scope": "source.sksp"
 	},
 	"icb": {
 		"prefix": "icb",
-		"body": "\non init\n\t${0}\nend on\n",
+		"body": "on init\n\t${0}\nend on\n",
 		"description": "init callback",
 		"scope": "source.sksp"
 	},
 	"lcb": {
 		"prefix": "lcb",
-		"body": "\non listener\n\tselect NI_SIGNAL_TYPE\n\t\tcase NI_SIGNAL_TRANSP_START\n\t\t\t${1}\n\t\tcase NI_SIGNAL_TRANSP_STOP\n\t\t\t${2}\n\t\tcase NI_SIGNAL_TIMER_BEAT\n\t\t\t${3}\n\t\tcase NI_SIGNAL_TIMER_MS\n\t\t\t${4}\n\tend select\nend on\n",
+		"body": "on listener\n\tselect NI_SIGNAL_TYPE\n\t\tcase NI_SIGNAL_TRANSP_START\n\t\t\t${1}\n\t\tcase NI_SIGNAL_TRANSP_STOP\n\t\t\t${2}\n\t\tcase NI_SIGNAL_TIMER_BEAT\n\t\t\t${3}\n\t\tcase NI_SIGNAL_TIMER_MS\n\t\t\t${4}\n\tend select\nend on\n",
 		"description": "listener callback",
 		"scope": "source.sksp"
 	},
 	"midi": {
 		"prefix": "midi",
-		"body": "\non midi_in\n\t${0}\nend on\n",
+		"body": "on midi_in\n\t${0}\nend on\n",
 		"description": "MIDI in callback",
 		"scope": "source.sksp"
 	},
 	"ncb": {
 		"prefix": "ncb",
-		"body": "\non note\n\t${0}\nend on\n",
+		"body": "on note\n\t${0}\nend on\n",
 		"description": "note callback",
 		"scope": "source.sksp"
 	},
 	"nccb": {
 		"prefix": "nccb",
-		"body": "\non note_controller\n\t${0}\nend on\n",
+		"body": "on note_controller\n\t${0}\nend on\n",
 		"description": "note controller callback",
 		"scope": "source.sksp"
 	},
 	"nrpn": {
 		"prefix": "nrpn",
-		"body": "\non nrpn\n\t${0}\nend on\n",
+		"body": "on nrpn\n\t${0}\nend on\n",
 		"description": "NRPN callback",
 		"scope": "source.sksp"
 	},
 	"pcc": {
 		"prefix": "pcc",
-		"body": "\non persistence_changed\n\t${0}\nend on\n",
+		"body": "on persistence_changed\n\t${0}\nend on\n",
 		"description": "persistence changed callback",
 		"scope": "source.sksp"
 	},
 	"pgsc": {
 		"prefix": "pgsc",
-		"body": "\non pgs_changed\n\t${0}\nend on\n",
+		"body": "on pgs_changed\n\t${0}\nend on\n",
 		"description": "PGS callback",
 		"scope": "source.sksp"
 	},
 	"pat": {
 		"prefix": "pat",
-		"body": "\non poly_at\n\t${0}\nend on\n",
+		"body": "on poly_at\n\t${0}\nend on\n",
 		"description": "poly AT callback",
 		"scope": "source.sksp"
 	},
 	"rcb": {
 		"prefix": "rcb",
-		"body": "\non release\n\t${0}\nend on\n",
+		"body": "on release\n\t${0}\nend on\n",
 		"description": "release callback",
 		"scope": "source.sksp"
 	},
 	"rpn": {
 		"prefix": "rpn",
-		"body": "\non rpn\n\t${0}\nend on\n",
+		"body": "on rpn\n\t${0}\nend on\n",
 		"description": "RPN callback",
 		"scope": "source.sksp"
 	},
 	"uicb": {
 		"prefix": "uicb",
-		"body": "\non ui_control (${1:control_name})\n\t${0}\nend on\n",
+		"body": "on ui_control (${1:control_name})\n\t${0}\nend on\n",
 		"description": "single UI control callback",
 		"scope": "source.sksp"
 	},
 	"uicbs": {
 		"prefix": "uicbs",
-		"body": "\non ui_controls\n\t${0}\nend on\n",
+		"body": "on ui_controls\n\t${0}\nend on\n",
 		"description": "global UI controls callback",
 		"scope": "source.sksp"
 	},
 	"upd": {
 		"prefix": "upd",
-		"body": "\non ui_update\n\t${0}\nend on\n",
+		"body": "on ui_update\n\t${0}\nend on\n",
 		"description": "UI update callback",
 		"scope": "source.sksp"
 	},
@@ -283,31 +283,31 @@
 	},
 	"property": {
 		"prefix": "property",
-		"body": "\nproperty ${1:name}\n\tfunction get -> result\n\t\tresult := ${2:expression}\n\tend function\n\n\tfunction set(value)\n\t\t${3:expression} := value\n\tend function\nend property\n",
+		"body": "property ${1:name}\n\tfunction get -> result\n\t\tresult := ${2:expression}\n\tend function\n\n\tfunction set(value)\n\t\t${3:expression} := value\n\tend function\nend property\n",
 		"description": "property",
 		"scope": "source.sksp"
 	},
 	"select": {
 		"prefix": "select",
-		"body": "\nselect ${1:value}\n\tcase ${2:constant}\n\t\t${3:statements}\n\tcase ${4:constant}\n\t\t${5:statements}\nend select\n",
+		"body": "select ${1:value}\n\tcase ${2:constant}\n\t\t${3:statements}\n\tcase ${4:constant}\n\t\t${5:statements}\nend select\n",
 		"description": "select",
 		"scope": "source.sksp"
 	},
 	"START": {
 		"prefix": "START",
-		"body": "\nSTART_INC (${1:counter}, ${2:start}, ${3:increment})\n\t${4:statements}\nEND_INC\n",
+		"body": "START_INC (${1:counter}, ${2:start}, ${3:increment})\n\t${4:statements}\nEND_INC\n",
 		"description": "START_INC",
 		"scope": "source.sksp"
 	},
 	"struct": {
 		"prefix": "struct",
-		"body": "\nstruct ${0:name}\n\t${1}\nend struct\n",
+		"body": "struct ${0:name}\n\t${1}\nend struct\n",
 		"description": "struct block",
 		"scope": "source.sksp"
 	},
 	"taskfunc": {
 		"prefix": "taskfunc",
-		"body": "\ntaskfunc ${1:name}\n\t${0}\nend taskfunc\n",
+		"body": "taskfunc ${1:name}\n\t${0}\nend taskfunc\n",
 		"description": "taskfunc",
 		"scope": "source.sksp"
 	},
@@ -409,25 +409,25 @@
 	},
 	"USE": {
 		"prefix": "USE",
-		"body": "\nUSE_CODE_IF(${1:condition})\n\t${2:code}\nEND_USE_CODE\n",
+		"body": "USE_CODE_IF(${1:condition})\n\t${2:code}\nEND_USE_CODE\n",
 		"description": "USE_CODE_IF",
 		"scope": "source.sksp"
 	},
 	"USEN": {
 		"prefix": "USEN",
-		"body": "\nUSE_CODE_IF_NOT(${1:condition})\n\t${2:code}\nEND_USE_CODE\n",
+		"body": "USE_CODE_IF_NOT(${1:condition})\n\t${2:code}\nEND_USE_CODE\n",
 		"description": "USE_CODE_IF_NOT",
 		"scope": "source.sksp"
 	},
 	"while": {
 		"prefix": "while",
-		"body": "\nwhile (${1:condition})\n\t${2}\nend while\n",
+		"body": "while (${1:condition})\n\t${2}\nend while\n",
 		"description": "while loop",
 		"scope": "source.sksp"
 	},
 	"whilec": {
 		"prefix": "whilec",
-		"body": "\n${1:i} := 0\nwhile (${1:i} < ${2:max})\n\t${3}\n\tinc(${1:i})\nend while\n",
+		"body": "${1:i} := 0\nwhile (${1:i} < ${2:max})\n\t${3}\n\tinc(${1:i})\nend while\n",
 		"description": "while with counter",
 		"scope": "source.sksp"
 	}
