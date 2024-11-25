@@ -1541,6 +1541,8 @@ RESET_CONDITION(<condition>)
 SET_CONDITION(<condition>)
 USE_CODE_IF(<condition>)
 USE_CODE_IF_NOT(<condition>)
+START_INC(<text>, <from>, <to>)
+END_INC
 _get_engine_par(<parameter>, <group>, <slot>, <generic>):integer
 _get_engine_par_disp(<parameter>, <group>, <slot>, <generic>):string
 _get_folder(<file-path>):string
@@ -1583,6 +1585,14 @@ change_tune(<event-id>, <tune-amount>, <relative-bit>)
 change_velo(<event-id>, <new-velocity-number>)
 change_vol(<event-id>, <volume>, <relative-bit>)
 cbrt(<real-value>):real
+concat(<array1>):array
+concat(<array1>, <array2>):array
+concat(<array1>, <array2>, <array3>):array
+concat(<array1>, <array2>, <array3>, <array4>):array
+concat(<array1>, <array2>, <array3>, <array4>, <array5>):array
+concat(<array1>, <array2>, <array3>, <array4>, <array5>, <array6>):array
+concat(<array1>, <array2>, <array3>, <array4>, <array5>, <array6>, <array7>):array
+concat(<array1>, <array2>, <array3>, <array4>, <array5>, <array6>, <array7>, <array8>):array
 continue
 cos(<real-value>):real
 dec(<expression>):integer
@@ -1674,6 +1684,7 @@ int_to_real(<integer>):real
 is_zone_empty(<zone-id>):integer
 iterate_macro(<expression>)
 iterate_post_macro(<expression>)
+list_add(<list>, <value>)
 literate_macro(<expression>)
 literate_post_macro(<expression>)
 load_array(<any-array-variable>, <mode>):integer
