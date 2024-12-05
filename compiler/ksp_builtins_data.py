@@ -1869,9 +1869,9 @@ ticks_to_ms(<ticks>):integer
 unload_slot(<instr-slot-idx>)
 wait(<wait-time>)
 wait_async(<event-id>):integer
+wait_ticks(<wait-time>)
 watch_var(<variable>)
 watch_array_idx(<any-array-variable>, <index>)
-wait_ticks(<wait-time>)
 will_never_terminate(<event-id>)
 zone_slice_idx_loop_end(<zone-id>, <loop-idx>):integer
 zone_slice_idx_loop_start(<zone-id>, <loop-idx>):integer
