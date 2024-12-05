@@ -39,9 +39,22 @@ To use features of SublimeKSP before official package releases:
  * After pulling the latest changes (`git pull`), reload Sublime Text
  * If you wish to pull in latest changes without restarting Sublime Text, we recommend installing [Automatic​Package​Reloader](https://packagecontrol.io/packages/AutomaticPackageReloader)
 
-### Running From Command Line
+### Contributing
 
-SublimeKSP compiler can also be executed from command line, by simply running `ksp_compiler.py` with the appropriate source (and optionally output) file path(s),
+Bug reports, feature requests, and especially pull requests with bug fixes and feature implementations are welcome! Let us know by opening an issue on GitHub so that we can start a discussion.
+
+Building the extension locally is fairly straightforward. For Sublime Text, all you need to do is use the manual installation as explained above. For VS Code, the main prerequisite is to have [node.js](https://nodejs.org/en/download/prebuilt-installer) installed on your machine. From there:
+
+* Clone this GitHub repository on your hard drive
+* Navigate to the repository folder from command line
+* Execute `npm install` from the command line to bootstrap things required in order to build the VS Code extension
+* If adding new built-in data (for example, new engine parameters or new functions introduced to KSP), make sure to run the `update-builtins.py` script from `dev/` folder!
+* When adding new snippets, make sure there is _no_ newline after the `CDATA[` part, as this would misbehave in VS Code (Sublime Text disregards this potential extra newline, VS Code does not)
+* To build the VSIX extension, simply run `build-vsix.sh` from Bash shell or `build-vsix.bat` from Windows command line
+
+### Compiling From The Command Line
+
+SublimeKSP compiler can also be executed from the command line, by simply running `ksp_compiler.py` with the appropriate source (and optionally output) file path(s),
 along with optional compiler switches.
 For this, you need to use the manual installation of SublimeKSP, in order to have direct access to `ksp_compiler.py` file. To execute a compilation of a file,
 it is as simple as typing:

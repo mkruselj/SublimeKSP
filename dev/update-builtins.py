@@ -149,3 +149,39 @@ with fileinput.input('../KSP.sublime-syntax', inplace = True) as f:
             print(modified_line)
         else:
             print(line, end = '')
+
+with fileinput.input('../vscode/syntaxes/sksp.tmLanguage.json', inplace = True) as f:
+    section_idx = -1
+    line_count = 0
+    tabs = '            '
+
+    for line in f:
+        if line.lstrip().startswith('"builtin_const'):
+            section_idx = 1
+            counter = 4
+        elif line.lstrip().startswith('"builtin_fun'):
+            section_idx = 2
+            counter = 4
+        elif line.lstrip().startswith('"builtin_par'):
+            section_idx = 3
+            counter = 4
+
+        if section_idx == -1:
+            print(line, end = '')
+        else:
+            counter -= 1
+
+            if counter == 0:
+                modified_line = f'{tabs}"match": '
+
+                if section_idx == 1:
+                    modified_line += f'"{constsvars.replace('\\', '\\\\')}"'
+                elif section_idx == 2:
+                    modified_line += f'"{funs.replace('\\', '\\\\')}"'
+                elif section_idx == 3:
+                    modified_line = f'{tabs}"begin": "(->)\\\\s*({shorthands.replace('\\', '\\\\')})",'
+
+                print(modified_line)
+                section_idx = -1
+            else:
+                print(line, end = '')
