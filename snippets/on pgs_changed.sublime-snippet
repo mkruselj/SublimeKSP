@@ -1,8 +1,7 @@
 <snippet>
     <content><![CDATA[on pgs_changed
 	${0}
-end on
-]]></content>
+end on]]></content>
 	<description>PGS callback</description>
     <tabTrigger>pgsc</tabTrigger>
     <scope>source.sksp</scope>
