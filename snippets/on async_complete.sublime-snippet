@@ -1,8 +1,7 @@
 <snippet>
 	<content><![CDATA[on async_complete
 	${0}
-end on
-]]></content>
+end on]]></content>
 	<description>async callback</description>
 	<tabTrigger>acc</tabTrigger>
 	<scope>source.sksp</scope>
