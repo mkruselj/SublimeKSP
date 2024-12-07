@@ -1,8 +1,7 @@
 <snippet>
     <content><![CDATA[on nrpn
 	${0}
-end on
-]]></content>
+end on]]></content>
 	<description>NRPN callback</description>
     <tabTrigger>nrpn</tabTrigger>
     <scope>source.sksp</scope>
