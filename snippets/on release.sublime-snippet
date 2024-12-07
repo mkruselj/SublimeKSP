@@ -1,8 +1,7 @@
 <snippet>
 	<content><![CDATA[on release
 	${0}
-end on
-]]></content>
+end on]]></content>
 	<description>release callback</description>
 	<tabTrigger>rcb</tabTrigger>
 	<scope>source.sksp</scope>
