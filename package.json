@@ -24,6 +24,10 @@
         "extensions": [
           ".ksp"
         ],
+        "icon": {
+          "dark": "file_icon/file_type_ksp@2x.png",
+          "light": "file_icon/file_type_ksp_dark@2x.png"
+        },
         "configuration": "./language-configuration.json"
       }
     ],

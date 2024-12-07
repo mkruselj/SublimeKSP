@@ -1,8 +1,7 @@
 <snippet>
     <content><![CDATA[for ${1:i} := ${2:0} to ${3:max}
 	${0}
-end for
-]]></content>
+end for]]></content>
 	<description>for loop</description>
     <tabTrigger>for</tabTrigger>
     <scope>source.sksp</scope>

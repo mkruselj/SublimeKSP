@@ -1,8 +1,7 @@
 <snippet>
 	<content><![CDATA[on controller
 	${0}
-end on
-]]></content>
+end on]]></content>
 	<description>controller callback</description>
 	<tabTrigger>ccb</tabTrigger>
 	<scope>source.sksp</scope>

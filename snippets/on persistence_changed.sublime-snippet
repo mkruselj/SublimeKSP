@@ -1,8 +1,7 @@
 <snippet>
 	<content><![CDATA[on persistence_changed
 	${0}
-end on
-]]></content>
+end on]]></content>
 	<description>persistence changed callback</description>
 	<tabTrigger>pcc</tabTrigger>
 	<scope>source.sksp</scope>

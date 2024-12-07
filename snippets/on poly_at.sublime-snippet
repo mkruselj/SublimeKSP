@@ -1,8 +1,7 @@
 <snippet>
 	<content><![CDATA[on poly_at
 	${0}
-end on
-]]></content>
+end on]]></content>
 	<description>poly AT callback</description>
 	<tabTrigger>pat</tabTrigger>
 	<scope>source.sksp</scope>

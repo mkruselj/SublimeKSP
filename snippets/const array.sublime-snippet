@@ -1,8 +1,7 @@
 <snippet>
     <content><![CDATA[const ${1:name}
     ${2:entry}
-end const
-]]></content>
+end const]]></content>
     <description>const array</description>
     <tabTrigger>car</tabTrigger>
     <scope>source.sksp</scope>
