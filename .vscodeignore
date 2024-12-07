@@ -13,8 +13,10 @@ node_modules/**
 *.sublime-menu
 *.sublime-settings
 *.sublime-syntax
+*.sublime-theme
 *.tmPreferences
-file_icon/**
+file_icon/*.tmPreferences
+file_icon/*.sublime-theme
 messages/**
 snippets/*.sublime-snippet
 sounds/**
@@ -25,4 +27,5 @@ ksp_plugin.py
 # SublimeKSP compiler test runners and VS Code extension build script
 run-tests.bat
 run-tests.sh
+build-vsix.bat
 build-vsix.sh
