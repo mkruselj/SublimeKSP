@@ -1,8 +1,7 @@
 <snippet>
     <content><![CDATA[while (${1:condition})
 	${2}
-end while
-]]></content>
+end while]]></content>
 	<description>while loop</description>
     <tabTrigger>while</tabTrigger>
     <scope>source.sksp</scope>
