@@ -3,8 +3,7 @@
 	${2}
 else if ${3:condition}
 	${4}
-end if
-]]></content>
+end if]]></content>
 	<description>if else if</description>
     <tabTrigger>iei</tabTrigger>
     <scope>source.sksp</scope>

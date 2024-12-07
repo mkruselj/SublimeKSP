@@ -1,8 +1,7 @@
 <snippet>
     <content><![CDATA[family ${1:name}
 	${0}
-end family
-]]></content>
+end family]]></content>
 	<description>family</description>
     <tabTrigger>family</tabTrigger>
     <scope>source.sksp</scope>

@@ -72,17 +72,71 @@
             "comment": "Control and event parameter shorthands"
         },
         {
-            "match": "\\b((call)\\s+([\\w.]+)|([\\w.]+)(\\(\\s*\\)))",
+            "comment": "Macro definition",
+            "begin": "(macro)\\s+([\\w.]+)(\\()?",
+            "beginCaptures": {
+                "1": { "name": "keyword.source.sksp" },
+                "2": { "name": "entity.name.function.source.sksp" },
+                "3": { "name": "punctuation.source.sksp" }
+            },
+            "end": "(\\))|$",
+            "endCaptures": { "1": { "name": "punctuation.source.sksp" } },
+            "patterns": [
+                { "include": "#macrotoken" },
+                { "include": "#functionarg" }
+            ]
+        },
+        {
+            "comment": "Function definition",
+            "begin": "(function)\\s+([\\w.]+)(\\()?",
+            "beginCaptures": {
+                "1": { "name": "keyword.source.sksp" },
+                "2": { "name": "entity.name.function.source.sksp" },
+                "3": { "name": "punctuation.source.sksp" }
+            },
+            "end": "(\\))|(override)?$",
+            "endCaptures": {
+                "1": { "name": "punctuation.source.sksp" },
+                "2": { "name": "keyword.source.sksp" }
+            },
+            "patterns": [
+                { "include": "#functionarg" },
+                {
+                    "match": "\\bout|var\\b",
+                    "name": "invalid.illegal"
+                }
+            ]
+        },
+        {
+            "comment": "Task function definition",
+            "begin": "(taskfunc)\\s+([\\w.]+)(\\()?",
+            "beginCaptures": {
+                "1": { "name": "keyword.source.sksp" },
+                "2": { "name": "entity.name.function.source.sksp" },
+                "3": { "name": "punctuation.source.sksp" }
+            },
+            "end": "(\\))|$",
+            "endCaptures": { "1": { "name": "punctuation.source.sksp" } },
+            "patterns": [
+                { "include": "#functionarg" },
+                {
+                    "match": "\\bout|var\\b",
+                    "name": "keyword.source.sksp"
+                }
+            ]
+        },
+        {
+            "match": "^\\s*((call)\\s+([\\w.]+)|([\\w.]+)(\\(\\s*\\)))",
             "comment": "Function call",
             "captures": {
-                "2": { "name": "keyword.other.source.sksp" },
+                "2": { "name": "keyword.source.sksp" },
                 "3": { "name": "meta.function-call.source.sksp" },
                 "4": { "name": "meta.function-call.source.sksp" },
                 "5": { "name": "punctuation.source.sksp" }
             }
         },
         {
-            "name": "keyword.other.source.sksp",
+            "name": "keyword.source.sksp",
             "match": "(?!#)\\b(struct|define|literals|on|(inst)?pers|read|list|call|if|(down)?to|else|for|while|select|case|continue|step|function|taskfunc|macro|mod|declare|const|polyphonic|end(_on)?|local|global|family|import|as|property|out|override|ui_(label|button|switch|slider|menu|value_edit|waveform|wavetable|knob|table|xy|text_edit|level_meter|file_selector|panel|mouse_area)|var)\\b(?!#)",
             "comment": "Keywords"
         },
@@ -116,6 +170,12 @@
         }
     ],
     "repository": {
+        "functionarg": {
+            "name": "variable.parameter.source.sksp",
+            "comment": "Function argument",
+            "match": "([\\w.]+)\\s*(?=,|\\))",
+            "captures": { "1": { "name": "variable.parameter.source.sksp" } }
+        },
         "macrotoken": {
             "name": "variable.parameter.source.sksp",
             "comment": "Macro replacement token",

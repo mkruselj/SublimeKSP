@@ -10,8 +10,7 @@
 		case NI_SIGNAL_TIMER_MS
 			${4}
 	end select
-end on
-]]></content>
+end on]]></content>
 	<description>listener callback</description>
 	<tabTrigger>lcb</tabTrigger>
 	<scope>source.sksp</scope>

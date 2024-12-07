@@ -7,8 +7,7 @@
 	function set(value)
 		${3:expression} := value
 	end function
-end property
-]]></content>
+end property]]></content>
 	<description>property</description>
 	<tabTrigger>property</tabTrigger>
 	<scope>source.sksp</scope>

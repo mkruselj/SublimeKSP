@@ -1,8 +1,7 @@
 <snippet>
 	<content><![CDATA[on ui_update
 	${0}
-end on
-]]></content>
+end on]]></content>
 	<description>UI update callback</description>
 	<tabTrigger>upd</tabTrigger>
 	<scope>source.sksp</scope>

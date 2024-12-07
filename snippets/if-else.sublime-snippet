@@ -3,8 +3,7 @@
 	${2}
 else
 	${3}
-end if
-]]></content>
+end if]]></content>
 	<description>if else</description>
     <tabTrigger>ife</tabTrigger>
     <scope>source.sksp</scope>
