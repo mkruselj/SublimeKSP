@@ -41,11 +41,11 @@ To use features of SublimeKSP before official package releases:
 
 ### Contributing
 
-Bug reports, feature requests, and especially pull requests with bug fixes and feature implementations are welcome! Let us know by opening an issue on GitHub so that we can start a discussion.
+Bug reports, feature requests, and especially pull requests with bug fixes and feature implementations are welcome! Let us know by [opening an issue](https://github.com/nojanath/SublimeKSP/issues) so that we can start a discussion.
 
-Building the extension locally is fairly straightforward. For Sublime Text, all you need to do is use the manual installation as explained above. For VS Code, the main prerequisite is to have [node.js](https://nodejs.org/en/download/prebuilt-installer) installed on your machine. From there:
+Building and modifying the extension locally is fairly straightforward. For Sublime Text, all you need to do is use the manual installation as explained above. For VS Code, the main prerequisite is to have [node.js](https://nodejs.org/en/download/prebuilt-installer) installed on your machine. From there:
 
-* Clone this GitHub repository on your hard drive
+* Clone this repository on your hard drive
 * Navigate to the repository folder from command line
 * Execute `npm install` from the command line to bootstrap things required in order to build the VS Code extension
 * If adding new built-in data (for example, new engine parameters or new functions introduced to KSP), make sure to run the `update-builtins.py` script from `dev/` folder!
@@ -54,17 +54,14 @@ Building the extension locally is fairly straightforward. For Sublime Text, all 
 
 ### Compiling From The Command Line
 
-SublimeKSP compiler can also be executed from the command line, by simply running `ksp_compiler.py` with the appropriate source (and optionally output) file path(s),
-along with optional compiler switches.
-For this, you need to use the manual installation of SublimeKSP, in order to have direct access to `ksp_compiler.py` file. To execute a compilation of a file,
-it is as simple as typing:
+SublimeKSP compiler can also be executed from the command line by simply running `ksp_compiler.py` with the appropriate source (and optionally output) file path(s), along with optional compiler switches.
+For this you need to use the manual installation of SublimeKSP, in order to have direct access to `ksp_compiler.py`. To execute a compilation of a file, it is as simple as typing:
 
 ```
 > python ksp_compiler.py "<source-file-path>"
 ```
 
-Various compiler options from SublimeKSP's Tools menu are also available. All of them are set to false if not used,
-and by including them in the command line, they are set to true:
+Various compiler options from SublimeKSP's Tools menu are also available. All of them are set to false if not used, and by including them in the command line, they are set to true:
 
 ```
 ksp_compiler.py [-h] [-c] [-v] [-e] [-o] [-t] [-d] source_file [output_file]
@@ -92,9 +89,7 @@ optional arguments:
 ```
 
 ### Updates
-* Updates to the plugin will be automatically installed via Package Control or Visual Studio Marketplace
-* Pull requests are welcome for bugfixes/updates/changes. If you aren't familiar with pull requests,
-just open an issue [here](https://github.com/nojanath/SublimeKSP/issues).
+Updates to the plugin will be automatically installed via Package Control or Visual Studio Marketplace.
 
 ### Documentation
 See the [Wiki](https://github.com/nojanath/SublimeKSP/wiki).
