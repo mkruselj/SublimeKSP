@@ -374,12 +374,12 @@ def parse_lines(s, filename = None, namespaces = None):
         f_connect = False
         hyphen_connect = False
         escaping = False
-        
+
         all_args = []
         arg_content = ''
         record_arg = False
         f_spots = []
-        
+
         for i, c in enumerate(line):
             if record_arg == True:
                 if c == '>' and not escaping and not hyphen_connect:
@@ -400,30 +400,30 @@ def parse_lines(s, filename = None, namespaces = None):
             elif c == "'" and not escaping:
                 in_string = not in_string
                 in_f_string = f_connect and in_string
-                
+
                 if in_f_string:
                     f_spots.append(i - 1)
             elif in_f_string and not escaping:
                 if c == '<':
                     record_arg = True
-            
+
             if c != 'f':
                 f_connect = False
             if c != '-':
                 hyphen_connect = False
             if c != '\\':
                 escaping = False
-        
+
         new_line = line
         deleted = 0
         for s in f_spots:
             index = s - deleted
             new_line = new_line[:index] + new_line[index+1:]
             deleted += 1
-            
+
         for a in all_args:
             new_line = new_line.replace("<{}>".format(a), "\' & {} & \'".format(a.replace('\\>', '>').replace('\\<', '<')))
-        
+
         return new_line
 
     if namespaces is None:
@@ -431,7 +431,7 @@ def parse_lines(s, filename = None, namespaces = None):
 
     lines = s.replace('\r\n', '\n').replace('\r', '\n').split('\n')
     lines = [process_f_string(l) for l in lines]
-    
+
     # encode lines numbers as '[[[lineno]]]' at the beginning of each line
     lines = ['[[[%.5d]]]%s' % (lineno+1, x) for (lineno, x) in enumerate(lines)]
 
@@ -569,7 +569,7 @@ def parse_lines_and_handle_imports(ivls_build, basepath, source, compiler_import
                     if l in filename:
                         filename = filename.replace(l, 'lib/' + l)
                         print(filename)
-                
+
                 new_sources = read_path(basepath, filename)
                 print("Saved file, loading external IVLS.")
             else:
@@ -579,7 +579,7 @@ def parse_lines_and_handle_imports(ivls_build, basepath, source, compiler_import
                     print("Unsaved file, loading internal IVLS.")
                 else:
                     raise Exception('Must save file before using non-STL imports!')
-            
+
             for path, source in new_sources:
                 if path not in compiler_import_cache:
                     compiler_import_cache.append(path)
@@ -2114,7 +2114,7 @@ class KSPCompiler(object):
         self.compiler_options_to_override = dict()
 
         self.compiler_import_cache = []
-        
+
         self.ivls_build = False
 
     def do_imports_and_convert_to_line_objects(self):
@@ -2122,7 +2122,7 @@ class KSPCompiler(object):
         if '__IVLS__' in self.source:
             self.source = self.source.replace('__IVLS__', '')
             self.ivls_build = True
-        
+
         # Import files
         self.lines = parse_lines_and_handle_imports(self.ivls_build,
                                                     self.basedir,
@@ -2197,7 +2197,7 @@ class KSPCompiler(object):
     def ivls_pre_analyze(self):
         from ivls import ivls_pre_analyze
         self.lines = ivls_pre_analyze(self.lines)
-        
+
     def ivls_node_assemble(self):
         from ivls import ivls_node_assemble
         self.lines = ivls_node_assemble(self.lines, self.define_cache)
@@ -2349,18 +2349,18 @@ class KSPCompiler(object):
         emitter = ksp_ast.Emitter(buffer, compact = self.compact)
         self.module.emit(emitter)
         self.compiled_code = buffer.getvalue()
-        
+
         lines = self.compiled_code.split('\n')
-        
+
         new_lines = []
         if self.add_compiled_date_comment:
             localtime = time.asctime( time.localtime(time.time()) )
             new_lines.append("{ Compiled on " + localtime + " }")
-        
+
         init_block = False
         for l in lines:
             new_lines.append(l)
-            
+
         self.compiled_code = '\n'.join(new_lines)
 
     def uncompress_variable_names(self, compiled_code):

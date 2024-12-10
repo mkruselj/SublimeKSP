@@ -5,49 +5,49 @@ from ksp_compiler import Line, ParseException
 def ivls_pre_analyze(line_obj_list):
     # custom fields
     fields = {}
-    
+
     pruned_code = deque()
     for line_obj in line_obj_list:
         line = line_obj.command.strip()
-        
+
         if line.startswith("vo_field"):
             import re
             match = re.match(r"vo_field\s+([\w\.]+)\s*=\s*(.+)\s+if\s+(.+)", line)
-            
+
             if not (match and match.group(1) and match.group(2) and match.group(3)):
                 raise ParseException(Line(line, [(None, 0)], None), 'Field declarations must be in form "vo_field \'name\' = \'default value\' if (\'boolean expression\')!')
-            
+
             var_name = match.group(1)
             value = match.group(2)
             predicate = match.group(3)
-            
+
             fields[var_name] = (value, predicate, line_obj.get_lineno(), line)
-            
+
             pruned_code.append(Line("__FIELD__,{}".format(var_name), [(None, line_obj.get_lineno())], None))
         else:
             pruned_code.append(line_obj)
-    
+
     subbed_code = deque()
     for line_obj in pruned_code:
         line = line_obj.command.strip()
-        
+
         if line.startswith("__FIELD__"):
             name = line.split(',')[1]
             default, predicate, line_no, line = fields[name]
-            
+
             if name not in predicate:
                 raise ParseException(Line(line, [(None, line_no)], None), 'Field requires field name in validation expression!')
-                
+
             pattern = r'(?<![\w\.])' + re.escape(name) + r'(?![\w\.])'
             predicate = re.sub(pattern, "#v#", predicate)
-            
+
             subbed_code.append(Line('define Voice.ADD_MEMBERS += {}'.format(name), [[None, line_no]], None))
             subbed_code.append(Line('define Voice.ADD_INIT += {}.default_value'.format(name), [[None, line_no]], None))
             subbed_code.append(Line('declare {}.default_value[] := ({})'.format(name, default), [[None, line_no]], None))
             subbed_code.append(Line('define Voice.validate.{}(#v#) := {}'.format(name, predicate), [[None, line_no]], None))
         else:
             subbed_code.append(line_obj)
-    
+
     return subbed_code
 
 voice_logic_taskfunc_title = 'taskfunc ivls.{}.VoiceLogic(var self, var self_invalid, var user_continue, var passed_vo, nenv)'
@@ -95,7 +95,7 @@ node_ui_switcher = '''
 def make_line_obj(code):
     from ksp_compiler import Line, ParseException
     return [Line(l, None, None) for l in code.split('\n')]
-    
+
 def parse_node_macros(code_lines, define_cache):
     from ksp_compiler import Line, ParseException
 
@@ -122,28 +122,28 @@ def parse_node_macros(code_lines, define_cache):
     ivls_syntax = False
     for line_obj in code_lines:
         line = line_obj.command.strip()
-        
+
         if line.startswith("macro Node."):
             if ivls_syntax:
                 raise ParseException(line_obj, 'You may not use SublimeKSP macros inside of IVLS nodes!')
-            
+
             parts = line.split(".")
             current_node = ".".join(parts[1:-1])
             current_callback = parts[-1].split("(")[0]
-            
+
             if current_node not in node_cb:
                 node_cb[current_node] = defaultdict(list)
-            
+
             if current_callback in node_cb[current_node]:
                 raise ParseException(line_obj, 'Callback {} has been declared twice in node {}!'.format(current_callback, current_node))
-            
+
             if current_callback == 'NotePass':
                 if 'NoteOn' in node_cb[current_node] or 'NoteOff' in node_cb[current_node]:
                     raise ParseException(line_obj, 'Can not add NotePass callback to Node with NoteOn/NoteOff callback!'.format(current_callback, current_node))
             elif current_callback == 'NoteOn' or current_callback == 'NoteOff':
                 if 'NotePass' in node_cb[current_node]:
                     raise ParseException(line_obj, 'Can not add NoteOn or NoteOff callback to Node with NotePass callback!'.format(current_callback, current_node))
-            
+
         elif line.startswith('macro '):
             if ivls_syntax:
                 raise ParseException(line_obj, 'You may not use SublimeKSP macros inside of IVLS nodes!')
@@ -152,47 +152,47 @@ def parse_node_macros(code_lines, define_cache):
         elif line.startswith("node "):
             if not line.endswith(':'):
                 raise ParseException(line_obj, 'Node declaration must end in \':\'! \n {}')
-            
+
             ivls_syntax = True
-            
+
             if line.startswith("node ") and " from " in line:
                 name = line.split(" from ")[0]
             else:
                 name = line
 
             name = name.strip('node').strip(':').strip()
-                
+
             if current_node:
                 raise ParseException(line_obj, 'You can not nest nodes! Found \'{}\' inside of \'{}\''.format(name, current_node))
-            
+
             current_node = name
-            
+
             if current_node not in node_cb:
                 node_cb[current_node] = defaultdict(list)
 
         elif line.startswith("cb "):
             if not line.endswith(':'):
                 raise ParseException(line_obj, 'Node declaration must end in \':\'!')
-            
+
             name = line.strip('cb').strip(':').strip()
-            
+
             if not current_node:
                 raise ParseException(line_obj, 'Callback must be inside a node!')
             elif name in node_cb[current_node]:
                 raise ParseException(line_obj, 'Callback {} has been declared twice in node {}!'.format(name, current_node))
-            
+
             if name == 'NotePass':
                 if 'NoteOn' in node_cb[current_node] or 'NoteOff' in node_cb[current_node]:
                     raise ParseException(line_obj, 'Can not add NotePass callback to Node with NoteOn/NoteOff callback!'.format(name, current_node))
             elif name == 'NoteOn' or name == 'NoteOff':
                 if 'NotePass' in node_cb[current_node]:
                     raise ParseException(line_obj, 'Can not add NoteOn or NoteOff callback to Node with NotePass callback!'.format(name, current_node))
-            
-            current_callback = name          
+
+            current_callback = name
         elif "end node" in line:
             if not current_node:
                 raise ParseException(line_obj, 'Invalid end node!')
-            
+
             ivls_syntax = False
             current_node = None
         elif line.startswith("end macro"):
@@ -210,20 +210,20 @@ def parse_node_macros(code_lines, define_cache):
 
                 if current_callback == 'NoteOff':
                     node_offs[current_node] = True
-                
+
                 line_obj.source_locations = line_obj.locations
                 if current_callback != 'Functions':
                     line_obj.node_cb = (current_node, current_callback)
 
                 if line.startswith('message('):
                     line_obj.command = line_obj.command.replace('message(', 'message("[ {} | {} ] " & '.format(current_node, current_callback))
-                
+
                 node_cb[current_node][current_callback].append(line_obj)
-                
+
                 if current_callback == 'NotePass':
                     if ('ivls.play' in line or 'ivls.pass' in line):
                         raise ParseException(line_obj, 'You may not use ivls.play() variants or ivls.pass in NotePass callbacks!')
-                
+
                 if current_callback == 'NoteOff' and ('ivls.play(' in line or 'ivls.pass' in line):
                     raise ParseException(line_obj, 'You may not use ivls.play() or ivls.pass() in NoteOff callbacks! Use ivls.play.oneshot() to prevent hangs.')
             else:
@@ -231,7 +231,7 @@ def parse_node_macros(code_lines, define_cache):
                     pruned_node_code.append(line_obj)
 
     unfound = []
-    unfound.extend(['- ' + n for n in node_names if n not in node_cb])    
+    unfound.extend(['- ' + n for n in node_names if n not in node_cb])
     if len(unfound) > 0:
         raise ParseException(pruned_node_code[0], 'Nodes added to assembly by developer, but source code not found: \n\n' + '\n'.join(unfound))
 
@@ -254,23 +254,23 @@ def parse_node_macros(code_lines, define_cache):
         for callback, lines in node_cb[base_node].items():
             if callback in node_cb[extender_node]:
                 continue
-            
+
             node_cb[extender_node][callback] = []
-            
+
             new_lines = []
             for line_obj in lines:
                 if "__VIRTUAL__" in line_obj.command:
                     virtual_callback = line_obj.command.split("__VIRTUAL__")[1].strip("()").strip()
                     if virtual_callback in node_cb[extender_node]:
                         new_lines.extend(node_cb[extender_node][virtual_callback])
-                        
+
                         # Remove this callback. Prevents calling itself if contains __RUN_CB__.
                         del node_cb[extender_node][virtual_callback]
                     else:
                         raise ParseException(line_obj, "Virtual callback '{}' not found in extender node '{}'.".format(virtual_callback, extender_node))
                 else:
                     new_lines.append(line_obj)
-            
+
             node_cb[extender_node][callback] = new_lines
 
     # Remove base nodes that have extenders
@@ -278,7 +278,7 @@ def parse_node_macros(code_lines, define_cache):
         if base_node in node_cb:
             if base_node in node_names:
                 raise ParseException(pruned_node_code[0], "Base nodes may not be added to assembly! Found base node '{}'.".format(base_node))
-            
+
             del node_cb[base_node]
 
     def inject_cb(lines, src_node, cb_name):
@@ -286,7 +286,7 @@ def parse_node_macros(code_lines, define_cache):
             if cb_name in node_cb[node] and not node == src_node:
                 for cb_l in node_cb[node][cb_name]:
                     lines.append(cb_l)
-        
+
     # Process node CB injections
     for node in node_names:
         for cb in node_cb[node]:
@@ -298,35 +298,35 @@ def parse_node_macros(code_lines, define_cache):
                     inject_cb(new_cb, node, cb_name)
                 else:
                     new_cb.append(cb_l)
-                    
-            node_cb[node][cb] = new_cb               
+
+            node_cb[node][cb] = new_cb
 
     # Inject Nodes directly in where IVLS commands are found
     pre_assembly_lines = deque()
     voiced_nodes = []
     for line_obj in pruned_node_code:
         line = line_obj.command.lstrip()
-        
+
         if line.startswith("__RUN_CB__"):
             cb_name = line.split('(')[1].split(')')[0]
             for node in node_names:
                 if cb_name in node_cb[node]:
                     # if cb_name == 'ICB':
                     #     pre_assembly_lines.append(Line("init_routine_timer := KSP_TIMER", None, None))
-                    
+
                     if cb_name == 'ICB':
                         pre_assembly_lines.append(Line("if(1=1)", None, None))
                     for cb_l in node_cb[node][cb_name]:
                         pre_assembly_lines.append(cb_l)
                     if cb_name == 'ICB':
                         pre_assembly_lines.append(Line("end if", None, None))
-                        
+
                     # if cb_name == 'ICB':
                     #     pre_assembly_lines.append(Line("if ((KSP_TIMER - init_routine_timer) / 1000) > 1", None, None))
                     #     pre_assembly_lines.append(Line("message(\"{} ICB Time (ms): \" & (KSP_TIMER - init_routine_timer) / 1000)".format(node), None, None))
                     #     pre_assembly_lines.append(Line("init_routine_timer := KSP_TIMER", None, None))
                     #     pre_assembly_lines.append(Line("end if", None, None))
-                        
+
         elif line.startswith("__CACHE_PASSES__"):
             for n in node_names:
                 if node_passes[n] == True:
@@ -356,7 +356,7 @@ def parse_node_macros(code_lines, define_cache):
                     if note_off_lines:
                         new_func_lines += note_off_lines
                     new_func_lines += make_line_obj(voice_logic_taskfunc_post_off)
-                        
+
                     pre_assembly_lines.extend(new_func_lines)
         elif line.startswith("__SELECT_VOICE_LOGIC__"):
             for n in node_names:
@@ -397,7 +397,7 @@ def parse_node_macros(code_lines, define_cache):
             for n in node_passes:
                 if node_passes[n] == True:
                     note_pass_lines = None
-                
+
                     if 'NotePass' in node_cb[n]:
                         note_pass_lines = node_cb[n]['NotePass']
 
@@ -409,7 +409,7 @@ def parse_node_macros(code_lines, define_cache):
                         if note_pass_lines:
                             new_func_lines += note_pass_lines
                         new_func_lines += make_line_obj(voice_pass_taskfunc_post_pass)
-                            
+
                         post_assembly_lines.extend(new_func_lines)
         elif line.startswith("__SELECT_VOICE_PASS__"):
             for n in node_names:
@@ -419,7 +419,7 @@ def parse_node_macros(code_lines, define_cache):
                         post_assembly_lines.append(Line(cb_l, None, None))
         else:
             post_assembly_lines.append(line_obj)
-            
+
     return post_assembly_lines
 
 import subprocess
