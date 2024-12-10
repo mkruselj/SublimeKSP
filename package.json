@@ -1,19 +1,27 @@
 {
   "name": "sublimeksp-vscode",
   "displayName": "SublimeKSP for VS Code",
-  "description": "SublimeKSP extension for VS Code",
+  "description": "A port of SublimeKSP extension for VS Code",
+  "publisher": "sublimeksp-authors",
   "icon": "file_icon/ksp_icon.png",
+  "license": "GPL-3.0-only",
+  "bugs": {
+    "url": "https://github.com/nojanath/SublimeKSP/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/nojanath/SublimeKSP.git"
   },
+  "homepage": "https://github.com/nojanath/SublimeKSP.git",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.95.0"
   },
   "categories": [
-    "Programming Languages"
+    "Programming Languages", "Snippets", "Themes"
   ],
+  "keywords": ["kontakt", "ksp", "native instruments", "ni"],
+  "pricing": "Free",
   "contributes": {
     "languages": [
       {
@@ -63,11 +71,16 @@
       }
     ]
   },
-  "devDependencies": {
-    "@vscode/vsce": "3.2.1"
-  },
-  "scripts": {
-    "package": "vsce package"
+  "main": "./vscode/src/extension.js",
+"devDependencies": {
+  "typescript": "^4.9.3",
+  "@types/vscode": "^1.88.0",
+  "@types/node": "16.x",
+  "@vscode/vsce": "3.2.1"
+},
+"scripts": {
+  "compile": "tsc -p ./",
+  "package": "vsce package"
   },
   "dependencies": {
     "convert-snippets-to-vscode": "^1.0.2"
