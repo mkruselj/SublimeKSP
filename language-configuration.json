@@ -36,11 +36,5 @@
         "increaseIndentPattern": "\\s*(on|const|if|else|select|while|function|taskfunc|macro|for|family|struct|list|property|case)\\b",
         "decreaseIndentPattern": "(?m)^\\s*(end\\s+(\\w+)|case\\b|else\\b)"
     },
-    "wordPattern": "/\\\\(\\)\"'-:,;<>~#^&\\*|\\+=\\[\\]\\{\\}`~?",
-    "folding": {
-        "markers": {
-            "start": "^\\s*macro\\b",
-            "end": "^\\s*end macro\\b"
-        }
-    }
+    "wordPattern": "/\\\\(\\)\"'-:,;<>~#^&\\*|\\+=\\[\\]\\{\\}`~?"
 }

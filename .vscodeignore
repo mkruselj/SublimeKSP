@@ -5,6 +5,8 @@
 dev/**
 node_modules/**
 .gitignore
+.gitattributes
+**/*.ts
 
 # Sublime Text extension files
 *.sublime-color-scheme
@@ -21,8 +23,9 @@ messages/**
 snippets/*.sublime-snippet
 sounds/**
 dependencies.json
-messages.json
 ksp_plugin.py
+messages.json
+tsconfig.json
 
 # SublimeKSP compiler test runners and VS Code extension build script
 run-tests.bat
