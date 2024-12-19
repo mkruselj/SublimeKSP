@@ -781,10 +781,12 @@ class ConstBlock(object):
         ''' Return the the commands for the whole const block. '''
         newLines = collections.deque()
         newLines.append(line.copy("declare %s[%s] := (%s)" % (self.name, len(self.memberNames), ", ".join(self.memberValues))))
+        newLines.append(line.copy("declare !%s.str[%s] := (%s)" % (self.name, len(self.memberNames), ", ".join(['"{}"'.format(n) for n in self.memberNames]))))
         newLines.append(line.copy("declare const %s.SIZE := %s" % (self.name, len(self.memberNames))))
 
         for memNum in range(len(self.memberNames)):
             newLines.append(line.copy("declare const %s.%s := %s" % (self.name, self.memberNames[memNum], self.memberValues[memNum])))
+            newLines.append(line.copy("declare const %s.%s.idx := %s" % (self.name, self.memberNames[memNum], memNum)))
 
         return(newLines)
 
@@ -802,7 +804,7 @@ def handleConstBlock(lines):
 
         if line.startswith("const"):
             m = re.search(constBlockStartRe, line)
-
+            
             if m:
                 constBlockObj = ConstBlock(m.group("name"))
                 inConstBlock = True
