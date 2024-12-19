@@ -13,14 +13,14 @@ def get_ivls_project_root(path):
         root = Path(cwd).anchor  # This gets "G:\" instead of "/"
     else:
         root = Path(cwd).root  # Standard Unix "/"
-    
+
     new = None
     while(not os.path.exists('./ivls.yml')):
         if os.getcwd() == root:
             return None
         os.chdir('..')
         new = os.getcwd()
-        
+
     os.chdir(compiler_wd)
 
     return new
