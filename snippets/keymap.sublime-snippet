@@ -1,12 +1,12 @@
 <snippet>
-	<content><![CDATA[
+    <content><![CDATA[
 define KEYMAPS += ${1:map_name}
 for keymap.i := 0 to 127
     keymap.request(${1:map_name}, 0, keymap.i, ...
         flow_name, ...
         NI_KEY_TYPE_DEFAULT, KEY_COLOR_BLUE, "")
 end for]]></content>
-	<description>callback</description>
-	<tabTrigger>keymap</tabTrigger>
-	<scope>source.ksp</scope>
+    <description>callback</description>
+    <tabTrigger>keymap</tabTrigger>
+    <scope>source.ksp</scope>
 </snippet>

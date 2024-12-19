@@ -1,5 +1,5 @@
 <snippet>
-	<content><![CDATA[
+    <content><![CDATA[
 define IVLS_NODES += ${1:Product}.Startup
 node ${1:Product}.Startup:
     cb PCCB:
@@ -64,7 +64,7 @@ import '_IVLS/builder.ksp'
 
 { #pragma save_compiled_source ../Resources/scripts/ivls-compiled.txt }
 ]]></content>
-	<description>callback</description>
-	<tabTrigger>ivls</tabTrigger>
-	<scope>source.ksp</scope>
+    <description>callback</description>
+    <tabTrigger>ivls</tabTrigger>
+    <scope>source.ksp</scope>
 </snippet>

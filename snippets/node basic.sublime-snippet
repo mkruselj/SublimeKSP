@@ -1,18 +1,18 @@
 <snippet>
-	<content><![CDATA[
+    <content><![CDATA[
 {{ ${1:NodeName} }}
 
 define ${2:IVLS_NODES} += ${1:NodeName}
 node ${1:NodeName}:
-	cb ICB:
-	cb NoteOn:
-		declare new_vo := ivls.new_voice(self)
-		
-		ivls.play(new_vo)
-	cb NoteOff:
+    cb ICB:
+    cb NoteOn:
+        declare new_vo := ivls.new_voice(self)
+        
+        ivls.play(new_vo)
+    cb NoteOff:
 end node
 ]]></content>
-	<description>callback</description>
-	<tabTrigger>node_basic</tabTrigger>
-	<scope>source.ksp</scope>
+    <description>callback</description>
+    <tabTrigger>node_basic</tabTrigger>
+    <scope>source.ksp</scope>
 </snippet>

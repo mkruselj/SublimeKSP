@@ -1,21 +1,21 @@
 <snippet>
-	<content><![CDATA[
+    <content><![CDATA[
 {{ ${1:NodeName} }}
 
 define ${2:IVLS_NODES} += ${1:NodeName}
 node ${1:NodeName}:
-	cb ICB:
-	cb FirstLoad:
-	cb PCCB:
-	cb CC:
-	cb Keymaps:
-	cb Flows:
-	cb Functions:
-	cb NoteOn:
-	cb NoteOff:
+    cb ICB:
+    cb FirstLoad:
+    cb PCCB:
+    cb CC:
+    cb Keymaps:
+    cb Flows:
+    cb Functions:
+    cb NoteOn:
+    cb NoteOff:
 end node
 ]]></content>
-	<description>callback</description>
-	<tabTrigger>node_common</tabTrigger>
-	<scope>source.ksp</scope>
+    <description>callback</description>
+    <tabTrigger>node_common</tabTrigger>
+    <scope>source.ksp</scope>
 </snippet>
