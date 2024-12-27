@@ -32,11 +32,8 @@ import time
 import json
 import copy
 import utils
-import sublime
 
 variable_prefixes = '$%@!?~'
-
-compiler_path = os.path.join(sublime.packages_path(), 'KSP (Kontakt Script Processor)', 'compiler')
 
 # regular expressions:
 white_space_re = r'(\s*(\{[^\n]*?\})?\s*)'
@@ -219,6 +216,9 @@ class ParseException(ExceptionWithMessage):
         if no_traceback:
             utils.disable_traceback()
 
+        if isinstance(line, str):
+            raise Exception("Unsupported line exception: {}".format(line))
+        
         if line.calling_lines:
             macro_chain = '\n'.join(['=> {}'.format(l.command.strip()) for l in line.calling_lines])
             line_content = 'Macro traceback:\n{}\n{}'.format(macro_chain, str(line).strip())
@@ -573,9 +573,8 @@ def parse_lines_and_handle_imports(ivls_build, basepath, source, compiler_import
                 new_sources = read_path(basepath, filename)
                 print("Saved file, loading external IVLS.")
             else:
-                print(compiler_path)
                 if '_IVLS' in filename:
-                    new_sources = read_path(compiler_path, filename)
+                    new_sources = read_path(os.path.dirname(os.path.abspath(__file__)), filename)
                     print("Unsaved file, loading internal IVLS.")
                 else:
                     raise Exception('Must save file before using non-STL imports!')
@@ -1119,7 +1118,7 @@ class ASTModifierNodesToNativeKSP(ASTModifierBase):
             local_varname = node.variable.identifier
 
             if local_varname.lower() in func.locals:
-                raise ksp_ast.ParseException(node.variable, "Local variable %d redeclared!" % local_varname)
+                raise ksp_ast.ParseException(node.variable, "Local variable {} redeclared!".format(local_varname))
 
             func.locals.add(local_varname.lower())
 
