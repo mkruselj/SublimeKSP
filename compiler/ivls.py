@@ -160,7 +160,7 @@ def parse_node_macros(code_lines, define_cache):
             else:
                 name = line
 
-            name = name.strip('node').strip(':').strip()
+            name = name.replace('node', '').strip(':').strip()
 
             if current_node:
                 raise ParseException(line_obj, 'You can not nest nodes! Found \'{}\' inside of \'{}\''.format(name, current_node))
@@ -241,7 +241,7 @@ def parse_node_macros(code_lines, define_cache):
         line = line_obj.command.strip()
         if line.startswith("node ") and " from " in line:
             extender_node, base_node = line.split(" from ")
-            extender_node = extender_node.strip("node").strip(":").strip()
+            extender_node = extender_node.replace("node", "").strip(":").strip()
             base_node = base_node.strip(":").strip()
 
             if base_node not in node_cb:
@@ -258,20 +258,23 @@ def parse_node_macros(code_lines, define_cache):
             node_cb[extender_node][callback] = []
 
             new_lines = []
+            to_delete = []
             for line_obj in lines:
                 if "__VIRTUAL__" in line_obj.command:
                     virtual_callback = line_obj.command.split("__VIRTUAL__")[1].strip("()").strip()
                     if virtual_callback in node_cb[extender_node]:
                         new_lines.extend(node_cb[extender_node][virtual_callback])
-
-                        # Remove this callback. Prevents calling itself if contains __RUN_CB__.
-                        del node_cb[extender_node][virtual_callback]
+                        to_delete.append(virtual_callback)
                     else:
                         raise ParseException(line_obj, "Virtual callback '{}' not found in extender node '{}'.".format(virtual_callback, extender_node))
                 else:
                     new_lines.append(line_obj)
 
             node_cb[extender_node][callback] = new_lines
+        
+        for cb in to_delete:
+            if cb in node_cb[extender_node]:
+                del node_cb[extender_node][cb]
 
     # Remove base nodes that have extenders
     for extender_node, base_node in extender_nodes.items():
