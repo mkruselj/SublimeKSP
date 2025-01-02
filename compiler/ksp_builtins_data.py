@@ -1062,7 +1062,6 @@ $NI_BEATMASHER_LENGTH_BAR
 $NI_BITE_HPF_MODE_5
 $NI_BITE_HPF_MODE_100
 $NI_BITE_HPF_MODE_200
-$NI_BITE_HPF_MODE_5
 $NI_BUS_OFFSET
 $NI_CB_TYPE_ASYNC_COMPLETE
 $NI_CB_TYPE_CONTROLLER
@@ -1590,6 +1589,13 @@ dec(<expression>):integer
 detect_drum_type(<zone-id>, <return-variable>):integer
 delete_event_mark(<event-id>, <bit-mark>)
 detect_instrument_type(<zone-id>, <return-variable>):integer
+detect_key(<zone-id>, <return-variable>):integer
+detect_tempo(<zone-id>, <return-variable>):integer
+detect_loudness(<zone-id>, <return-variable>):integer
+detect_peak(<zone-id>, <return-variable>):integer
+detect_pitch(<zone-id>, <return-variable>):integer
+detect_rms(<zone-id>, <return-variable>):integer
+detect_sample_type(<zone-id>, <return-variable>):integer
 detect_drum_type(<zone-id>, <return-variable>):integer
 disable_logging(<log-type>)
 disallow_group(<group-idx>)
