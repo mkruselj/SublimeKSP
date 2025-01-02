@@ -468,10 +468,10 @@ class ASTVisitorCheckStatementExprTypes(ASTVisitor):
 class ASTVisitorFindUsedVariables(ASTVisitor):
     '''Find used variables by traversing AST and store in set, used_variables'''
 
-    def __init__(self, ast, used_variables_set, var_as_assigns):
+    def __init__(self, ast, used_variables_set, var_assigns):
         ASTVisitor.__init__(self)
         self.used_variables = used_variables_set
-        self.var_assigns = var_as_assigns
+        self.var_assigns = var_assigns
         
         self.lvalue = None
         
@@ -955,9 +955,6 @@ class ASTModifierRemoveUnusedVariables(ASTModifier):
         if isinstance(lv, VarRef):
             var = str(lv.identifier).lower()
             
-            if 'cb_arg' in var:
-                print(var)
-                
             if var in self.var_assigns.keys():
                 if node in self.var_assigns[var]:
                     return []
