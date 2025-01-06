@@ -131,6 +131,9 @@ def parse_node_macros(code_lines, define_cache):
             current_node = ".".join(parts[1:-1])
             current_callback = parts[-1].split("(")[0]
 
+            if current_callback == 'Macros':
+                raise ParseException(line_obj, 'Node `Macros` callbacks may only be created using native IVLS `node` + `cb` syntax!')
+
             if current_node not in node_cb:
                 node_cb[current_node] = defaultdict(list)
 
@@ -146,7 +149,10 @@ def parse_node_macros(code_lines, define_cache):
 
         elif line.startswith('macro '):
             if ivls_syntax:
-                raise ParseException(line_obj, 'You may not use SublimeKSP macros inside of IVLS nodes!')
+                if current_callback != "Macros":
+                    raise ParseException(line_obj, 'You may not use SublimeKSP macros inside of IVLS nodes outside of a Macros callback!')
+                else:
+                    node_cb[current_node][current_callback].append(line_obj)
             else:
                 pruned_node_code.append(line_obj)
         elif line.startswith("node "):
@@ -197,12 +203,17 @@ def parse_node_macros(code_lines, define_cache):
             current_node = None
         elif line.startswith("end macro"):
             if ivls_syntax:
-                raise ParseException(line_obj, 'You may not use SublimeKSP macros inside of IVLS nodes!')
+                if current_callback != "Macros":
+                    raise ParseException(line_obj, 'You may not use SublimeKSP macros inside of IVLS nodes outside of a Macros callback!')
+                else:
+                    node_cb[current_node][current_callback].append(line_obj)
+
             if not current_node:
                 pruned_node_code.append(line_obj)
 
-            current_node = None
-            current_callback = None
+            if current_callback != 'Macros':
+                current_node = None
+                current_callback = None
         else:
             if current_node and current_callback:
                 if current_callback == 'NotePass':
