@@ -472,9 +472,9 @@ class ASTVisitorFindUsedVariables(ASTVisitor):
         ASTVisitor.__init__(self)
         self.used_variables = used_variables_set
         self.var_assigns = var_assigns
-        
+
         self.lvalue = None
-        
+
         self.traverse(ast)
 
     def visitDeclareStmt(self, parent, node, *args):
@@ -486,12 +486,12 @@ class ASTVisitorFindUsedVariables(ASTVisitor):
 
     def visitAssignStmt(self, parent, node, *args):
         children = node.get_childnodes()
-        
+
         if isinstance(children[0], VarRef):
             var_node = children[0].identifier
 
             name = str(var_node).lower()
-            
+
             if not name in self.used_variables:
                 if not name in self.var_assigns.keys():
                     self.var_assigns[name] = [node]
@@ -505,14 +505,14 @@ class ASTVisitorFindUsedVariables(ASTVisitor):
         else:
             for c in children:
                 self.dispatch(node, c, *args)
-    
+
         return False
 
     def visitID(self, parent, node, *args):
         if node != self.lvalue:
             name = str(node).lower()
             self.used_variables.add(name)
-        
+
             if name in self.var_assigns.keys():
                 del self.var_assigns[name]
         return False
@@ -886,9 +886,9 @@ class ASTModifierRemoveUnusedBranches(ASTModifier):
 
                     if (stop is not None and start <= value <= stop) or (start == value):
                         return stmts
-                
+
                 return []
-            
+
             except ParseException:
                 pass
 
@@ -932,7 +932,7 @@ class ASTModifierRemoveUnusedVariables(ASTModifier):
         ASTModifier.__init__(self)
         self.used_variables = used_variables
         self.var_assigns = var_assigns
-            
+
         self.traverse(module_ast)
 
     def modifyDeclareStmt(self, node):
@@ -949,12 +949,12 @@ class ASTModifierRemoveUnusedVariables(ASTModifier):
                 return [node]
         else:
             return flatten([self.modify(stmt) for stmt in statements])
-        
+
     def modifyAssignStmt(self, node, *args, **kwargs):
         lv = node.get_childnodes()[0]
         if isinstance(lv, VarRef):
             var = str(lv.identifier).lower()
-            
+
             if var in self.var_assigns.keys():
                 if node in self.var_assigns[var]:
                     return []

@@ -218,7 +218,7 @@ class ParseException(ExceptionWithMessage):
 
         if isinstance(line, str):
             raise Exception("Unsupported line exception: {}".format(line))
-        
+
         if line.calling_lines:
             macro_chain = '\n'.join(['=> {}'.format(l.command.strip()) for l in line.calling_lines])
             line_content = 'Macro traceback:\n{}\n{}'.format(macro_chain, str(line).strip())
@@ -537,7 +537,6 @@ def parse_lines_and_handle_imports(ivls_build, basepath, source, compiler_import
         source = preprocessor_func(source, namespaces)
 
     if ivls_build:
-        print("Adding IVLS importer implicitly...")
         source += '\nimport \"_IVLS/builder.ksp\"'
     lines = parse_lines(source, filename, namespaces)
     new_lines = collections.deque()
@@ -568,14 +567,11 @@ def parse_lines_and_handle_imports(ivls_build, basepath, source, compiler_import
                 for l in libs:
                     if l in filename:
                         filename = filename.replace(l, 'lib/' + l)
-                        print(filename)
 
                 new_sources = read_path(basepath, filename)
-                print("Saved file, loading external IVLS.")
             else:
                 if '_IVLS' in filename:
                     new_sources = read_path(os.path.dirname(os.path.abspath(__file__)), filename)
-                    print("Unsaved file, loading internal IVLS.")
                 else:
                     raise Exception('Must save file before using non-STL imports!')
 
@@ -2595,7 +2591,7 @@ if __name__ == "__main__":
     basepath = None
 
     if args.source_file.name != '<stdin>':
-        basepath = os.path.dirname(args.source_file.name)
+        basepath = os.path.dirname(os.path.abspath(args.source_file.name))
 
     # make sure that extra syntax checks are enabled if --optimize or --extra_branch_optimization arguments are used
     if (args.optimize or args.additional_branch_optimization) and args.extra_syntax_checks == False:
