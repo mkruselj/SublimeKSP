@@ -184,7 +184,7 @@ def parse_node_macros(code_lines, define_cache):
 
             if not current_node:
                 raise ParseException(line_obj, 'Callback must be inside a node!')
-            elif name in node_cb[current_node]:
+            elif name in node_cb[current_node].keys():
                 raise ParseException(line_obj, 'Callback {} has been declared twice in node {}!'.format(name, current_node))
 
             if name == 'NotePass':
@@ -201,12 +201,13 @@ def parse_node_macros(code_lines, define_cache):
 
             ivls_syntax = False
             current_node = None
+            current_callback = None
         elif line.startswith("end macro"):
             if ivls_syntax:
-                if current_callback != "Macros":
-                    raise ParseException(line_obj, 'You may not use SublimeKSP macros inside of IVLS nodes outside of a Macros callback!')
-                else:
+                if current_callback == "Macros":
                     node_cb[current_node][current_callback].append(line_obj)
+                else:
+                    raise ParseException(line_obj, 'You may not use SublimeKSP macros inside of IVLS nodes outside of a Macros callback!')
 
             if not current_node:
                 pruned_node_code.append(line_obj)
