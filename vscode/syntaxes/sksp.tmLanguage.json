@@ -154,7 +154,7 @@
         {
             "comment": "Single-quoted string",
             "name": "string.quoted.single.source.sksp",
-            "match": "'(?:[^'\\\\]|\\\\.)*'"
+            "match": "(?:f)?'(?:[^'\\\\]|\\\\.)*'"
         },
         {
             "comment": "Identifier",
