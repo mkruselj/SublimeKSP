@@ -175,11 +175,11 @@ with fileinput.input('../vscode/syntaxes/sksp.tmLanguage.json', inplace = True) 
                 modified_line = f'{tabs}"match": '
 
                 if section_idx == 1:
-                    modified_line += f'"{constsvars.replace('\\', '\\\\')}"'
+                    modified_line += f'"{constsvars.replace('\\', '\\\\').replace('?:', '')}"'
                 elif section_idx == 2:
-                    modified_line += f'"{funs.replace('\\', '\\\\')}"'
+                    modified_line += f'"{funs.replace('\\', '\\\\').replace('?:', '')}"'
                 elif section_idx == 3:
-                    modified_line = f'{tabs}"begin": "(->)\\\\s*({shorthands.replace('\\', '\\\\')})",'
+                    modified_line = f'{tabs}"begin": "(->)\\\\s*({shorthands.replace('\\', '\\\\').replace('?:', '')})",'
 
                 print(modified_line)
                 section_idx = -1
