@@ -100,6 +100,7 @@ def parse_node_macros(code_lines, define_cache):
     from ksp_compiler import Line, ParseException
 
     node_cb = OrderedDict()
+    node_args = {}
 
     current_node = None
     current_callback = None
@@ -168,9 +169,14 @@ def parse_node_macros(code_lines, define_cache):
 
             name = name.replace('node', '').strip(':').strip()
 
+            if '(' in name:
+                arg_str = name.split('(')[1].split(')')[0]
+                name = name.split('(')[0]
+                node_args[name] = utils.split_args(arg_str, 0)
+
             if current_node:
                 raise ParseException(line_obj, 'You can not nest nodes! Found \'{}\' inside of \'{}\''.format(name, current_node))
-
+            
             current_node = name
 
             if current_node not in node_cb:
@@ -227,9 +233,6 @@ def parse_node_macros(code_lines, define_cache):
                 if current_callback != 'Functions':
                     line_obj.node_cb = (current_node, current_callback)
 
-                if line.startswith('message('):
-                    line_obj.command = line_obj.command.replace('message(', 'message("[ {} | {} ] " & '.format(current_node, current_callback))
-
                 node_cb[current_node][current_callback].append(line_obj)
 
                 if current_callback == 'NotePass':
@@ -248,53 +251,107 @@ def parse_node_macros(code_lines, define_cache):
         raise ParseException(pruned_node_code[0], 'Nodes added to assembly by developer, but source code not found: \n\n' + '\n'.join(unfound))
 
     # Extract extender nodes and resolve inheritance
-    extender_nodes = {}
+    inheritance_map = {}
     for line_obj in code_lines:
         line = line_obj.command.strip()
         if line.startswith("node ") and " from " in line:
-            extender_node, base_node = line.split(" from ")
-            extender_node = extender_node.replace("node", "").strip(":").strip()
+            child_node, base_node = line.split(" from ")
+            child_node = child_node.replace("node", "").strip(":").strip()
+            
             base_node = base_node.strip(":").strip()
+            base_args = []
+            args = []
+            if '(' in base_node:
+                arg_str = base_node.split('(')[1].split(')')[0]
+                base_node = base_node.split('(')[0]
+                args = utils.split_args(arg_str, 0)
+
+            if base_node in node_args.keys():
+                base_args = node_args[base_node]
 
             if base_node not in node_cb:
                 raise ParseException(line_obj, "Base node '{}' is not defined.".format(base_node))
+            
+            if len(args) > 0 and not (base_node in node_args.keys()):
+                raise ParseException(line_obj, "Base node '{}' does not receive arguments!.".format(base_node))
+                
+            if len(args) != len(base_args):
+                raise ParseException(line_obj, "Base node '{}' requires arguments: {}".format(base_node, base_args))
 
-            extender_nodes[extender_node] = base_node
+            inheritance_map[child_node] = (base_node, dict(zip(base_args, args)))
 
-    for extender_node, base_node in extender_nodes.items():
+    for child_node, (base_node, arg_dict) in inheritance_map.items():
         # Copy base node callbacks to extender node
         for callback, lines in node_cb[base_node].items():
-            if callback in node_cb[extender_node]:
-                continue
+            base_forced = False
 
-            node_cb[extender_node][callback] = []
+            if not callback in node_cb[child_node]:
+                node_cb[child_node][callback] = []
 
-            new_lines = []
+            base_cb = []
             to_delete = []
             for line_obj in lines:
-                if "__VIRTUAL__" in line_obj.command:
+                for base_arg, arg in arg_dict.items():
+                    line_obj.command = line_obj.command.replace(base_arg, arg)
+
+                if "__ALWAYS__" in line_obj.command and base_forced == False:
+                    node_cb[child_node][callback].insert(0, Line('__PARENT__', None, None))
+                    base_forced = True
+                elif "__VIRTUAL__" in line_obj.command:
                     virtual_callback = line_obj.command.split("__VIRTUAL__")[1].strip("()").strip()
-                    if virtual_callback in node_cb[extender_node]:
-                        new_lines.extend(node_cb[extender_node][virtual_callback])
+                    if virtual_callback in node_cb[child_node]:
+                        base_cb.extend(node_cb[child_node][virtual_callback])
                         to_delete.append(virtual_callback)
                     else:
-                        raise ParseException(line_obj, "Virtual callback '{}' not found in extender node '{}'.".format(virtual_callback, extender_node))
+                        raise ParseException(line_obj, "Virtual callback '{}' not found in extender node '{}'.".format(virtual_callback, child_node))
                 else:
-                    new_lines.append(line_obj)
+                    base_cb.append(line_obj)
 
-            node_cb[extender_node][callback] = new_lines
+
+            if callback in node_cb[child_node]:
+                if callback in ['Functions', 'Macros']:
+                    merged_lines = []
+                    merged_lines.extend(base_cb)
+                    merged_lines.extend(node_cb[child_node][callback])
+                    
+                    node_cb[child_node][callback] = merged_lines
+                else:
+                    parent_called = False
+                    merged_lines = []
+                    for line_obj in node_cb[child_node][callback]:
+                        if '__PARENT__' in line_obj.command:
+                            parent_called = True
+                            for base_line in base_cb:
+                                merged_lines.append(base_line)
+                        else:
+                            merged_lines.append(line_obj)
+
+                    if parent_called:
+                        node_cb[child_node][callback] = merged_lines
+                    else:
+                        node_cb[child_node][callback] = base_cb
+            else:
+                node_cb[child_node][callback] = base_cb
         
         for cb in to_delete:
-            if cb in node_cb[extender_node]:
-                del node_cb[extender_node][cb]
+            if cb in node_cb[child_node]:
+                del node_cb[child_node][cb]
 
     # Remove base nodes that have extenders
-    for extender_node, base_node in extender_nodes.items():
+    for child_node, (base_node, arg_dict) in inheritance_map.items():
         if base_node in node_cb:
             if base_node in node_names:
                 raise ParseException(pruned_node_code[0], "Base nodes may not be added to assembly! Found base node '{}'.".format(base_node))
 
             del node_cb[base_node]
+
+    # Code modifications
+    for node in node_names:
+        for cb in node_cb[node]:
+            for cb_l in node_cb[node][cb]:
+                line = cb_l.command.lstrip()
+                if line.startswith('message('):
+                    cb_l.command = cb_l.command.replace('message(', 'message("[ {} | {} ] " & '.format(node, cb))
 
     def inject_cb(lines, src_node, cb_name):
         for node in node_names:

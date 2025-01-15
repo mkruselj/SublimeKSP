@@ -57,13 +57,13 @@ def substituteDefines(lines, define_cache = None):
 
     return cache
 
-def pre_macro_functions(lines):
+def pre_macro_functions(lines, define_cache = None):
     ''' This function is called before the macros have been expanded.
         Returns the resulting define objects as a cache to be re-used.
         lines is a deque of Line objects - see ksp_compiler.py.'''
     createBuiltinDefines(lines)
 
-    return substituteDefines(lines)
+    return substituteDefines(lines, define_cache)
 
 def macro_iter_functions(lines, placeholders=placeholders):
     ''' Will process macro iteration and return true if any were found '''

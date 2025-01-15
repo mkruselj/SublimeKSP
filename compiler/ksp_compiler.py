@@ -2180,6 +2180,12 @@ class KSPCompiler(object):
 
         self.define_cache = pre_macro_functions(self.lines)
 
+    def run_post_assemble_defines(self):
+        '''Create define cache and run pre_macro_functions from `preprocessor_plugins.py`'''
+        from preprocessor_plugins import pre_macro_functions
+
+        self.define_cache = pre_macro_functions(self.lines)
+
     def run_post_macro_functions(self):
         '''Run post_macro_functions from `preprocessor_plugins.py`'''
         from preprocessor_plugins import post_macro_functions, handleStringArrayInitialisation, handleArrayConcat
@@ -2200,7 +2206,12 @@ class KSPCompiler(object):
 
     def ivls_node_assemble(self):
         from ivls import ivls_node_assemble
+        from preprocessor_plugins import substituteDefines
+        
         self.lines = ivls_node_assemble(self.lines, self.define_cache)
+        
+        convert_strings_to_placeholders(self.lines)
+        self.define_cache = substituteDefines(self.lines, self.define_cache)
 
     def script_injection(self):
         from ivls import script_injection
