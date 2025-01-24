@@ -619,7 +619,7 @@ def handle_conditional_lines(lines):
             clear_this_line = True
 
         if not clear_this_line and 'SET_CONDITION(' in line:
-            m = re.search('\\((.+?)\\)', line)
+            m = re.search(r'\\((.+?)\\)', line)
 
             if m:
                 cond = m.group(1).strip()
@@ -637,7 +637,7 @@ def handle_conditional_lines(lines):
                         clear_this_line = True
 
         if 'USE_CODE_IF' in line:
-            m = re.search('\\((.+?)\\)', line)
+            m = re.search(r'\\((.+?)\\)', line)
 
             if m:
                 cond = m.group(1).strip()
@@ -2207,9 +2207,9 @@ class KSPCompiler(object):
     def ivls_node_assemble(self):
         from ivls import ivls_node_assemble
         from preprocessor_plugins import substituteDefines
-        
+
         self.lines = ivls_node_assemble(self.lines, self.define_cache)
-        
+
         convert_strings_to_placeholders(self.lines)
         self.define_cache = substituteDefines(self.lines, self.define_cache)
 
