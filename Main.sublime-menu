@@ -69,7 +69,7 @@
 					{
 						"command": "ksp_global_setting_toggle",
 						"args": {"setting": "ksp_compact_output", "default": false},
-						"caption": "Remove Indents and Empty Lines",
+						"caption": "Remove Indents",
 						"mnemonic": "I",
 						"id": "compact_output",
 						"checkbox": true
@@ -102,7 +102,7 @@
 					{
 						"command": "ksp_global_setting_toggle",
 						"args": {"setting": "ksp_additional_branch_optimization", "default": false},
-						"caption": "Additional Branch Optimization Steps",
+						"caption": "Additional Branch Optimization",
 						"mnemonic": "B",
 						"id": "additional_branch_optimization",
 						"checkbox": true
@@ -112,7 +112,7 @@
 						"command": "ksp_global_setting_toggle",
 						"args": {"setting": "ksp_add_compiled_date", "default": true},
 						"caption": "Add Compilation Date/Time Comment",
-						"mnemonic": "D",
+						"mnemonic": "T",
 						"id": "add_compiled_date_comment",
 						"checkbox": true
 					},
@@ -145,6 +145,13 @@
 					},
 
 					{"caption":"-"}, //separator
+
+					{
+						"command": "ksp_docs",
+						"caption": "SublimeKSP Documentation...",
+						"mnemonic": "D",
+						"id": "documentation"
+					},
 
 					{
 						"command": "ksp_about",
