@@ -2517,6 +2517,10 @@ class KSPCompiler(object):
 
             message = '\n'.join(messages)
 
+            with open('compile_fail_log.ksp', 'w') as out:
+                for l in self.lines:
+                    out.write(l.command + '\n')
+
             raise ParseException(line, message)
 
     def abort_compilation(self):
