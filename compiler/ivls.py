@@ -109,7 +109,12 @@ def parse_node_macros(code_lines, define_cache):
     for define_constant in define_cache:
         if define_constant.name == 'IVLS_ALL_NODES':
             node_order = define_constant.value
-            node_names = utils.split_args(node_order, 0)
+            try:
+                node_names = utils.split_args(node_order, 0)
+            except:
+                entries = [n for n in node_order.replace('\n', ' ').split(' ') if len(n) > 0]
+                raise ParseException(Line('[Node Define Assembly]', [(None, 0)], None), "Invalid node assembly. Check your define statements for proper syntax: \n{}".format('\n'.join(entries)))
+        
             break
 
     node_passes = {}
