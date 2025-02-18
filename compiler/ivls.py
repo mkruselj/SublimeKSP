@@ -281,6 +281,15 @@ def parse_node_macros(code_lines, define_cache):
             inheritance_map[child_node] = (base_node, dict(zip(base_args, args)))
 
     for child_node, (base_node, arg_dict) in inheritance_map.items():
+        if base_node in node_offs:
+            node_offs[child_node] = node_offs[base_node]
+
+        if base_node in node_passes:
+            node_passes[child_node] = node_passes[base_node]
+
+        if node_passes[child_node] and ('NoteOn' in node_cb[child_node] or 'NoteOff' in node_cb[child_node]):
+            raise ParseException(Line(line, [(None, 0)], None), "Child node '{}' cannot add NoteOn/NoteOff when base node '{}' is type NotePass!".format(child_node, base_node))
+            
         # Copy base node callbacks to extender node
         for callback, lines in node_cb[base_node].items():
             base_forced = False
@@ -295,6 +304,9 @@ def parse_node_macros(code_lines, define_cache):
                     line_obj.command = line_obj.command.replace(base_arg, arg)
 
                 if "__ALWAYS__" in line_obj.command and base_forced == False:
+                    if callback in ['Functions', 'Macros']:
+                        continue
+                    
                     node_cb[child_node][callback].insert(0, Line('__PARENT__', None, None))
                     base_forced = True
                 elif "__VIRTUAL__" in line_obj.command:
