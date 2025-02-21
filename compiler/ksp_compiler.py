@@ -2184,7 +2184,7 @@ class KSPCompiler(object):
         '''Create define cache and run pre_macro_functions from `preprocessor_plugins.py`'''
         from preprocessor_plugins import pre_macro_functions
 
-        self.define_cache = pre_macro_functions(self.lines)
+        self.define_cache = pre_macro_functions(self.lines, self.define_cache)
 
     def run_post_macro_functions(self):
         '''Run post_macro_functions from `preprocessor_plugins.py`'''
@@ -2447,6 +2447,7 @@ class KSPCompiler(object):
                  ('ivls pre-analysis',                lambda: self.ivls_pre_analyze(),                                                   True,                   1),
                  ('pre-macro processes',              lambda: self.run_pre_macro_functions(),                                            True,                   1),
                  ('ivls node assembly',               lambda: self.ivls_node_assemble(),                                                 True,                   1),
+                 ('post-assemble define collect',     lambda: self.run_post_assemble_defines(),                                            True,                   1),
 
                  ('parsing macros',                   lambda: self.extract_macros(),                                                     True,                   1),
                  ('expanding macros',                 lambda: self.expand_macros(),                                                      True,                   1),
@@ -2497,12 +2498,14 @@ class KSPCompiler(object):
                 if callback:
                     callback(desc, 100 * time_so_far / total_time) # parameters are: description, percent done
 
+                with open('compile_fail_log.ksp', 'w') as out:
+                    for l in self.lines:
+                        out.write(l.command + '\n')
                 func()
                 time_so_far += time
 
             return True
-
-        except ksp_ast.ParseException as e:
+        except (ksp_ast.ParseException, ParseException) as e:
             messages = []
 
             if isinstance(e.node, lex.LexToken):

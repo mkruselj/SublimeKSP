@@ -51,8 +51,8 @@ stringEvaluator = SimpleEval() # Object used to evaluate strings as maths expres
 
 #=================================================================================================
 
-def substituteDefines(lines, define_cache = None):
-    cache = handleDefineConstants(lines, define_cache)
+def substituteDefines(lines, define_cache = None, dont_search = True):
+    cache = handleDefineConstants(lines, define_cache, dont_search)
     handleDefineLiterals(lines) # Define literals are only avilable for backwards compatibility as regular defines now serve this purpose.
 
     return cache
@@ -61,9 +61,9 @@ def pre_macro_functions(lines, define_cache = None):
     ''' This function is called before the macros have been expanded.
         Returns the resulting define objects as a cache to be re-used.
         lines is a deque of Line objects - see ksp_compiler.py.'''
-    createBuiltinDefines(lines)
-
-    return substituteDefines(lines, define_cache)
+    if not define_cache:
+        createBuiltinDefines(lines)
+    return substituteDefines(lines, define_cache, False)
 
 def macro_iter_functions(lines, placeholders=placeholders):
     ''' Will process macro iteration and return true if any were found '''
@@ -1628,96 +1628,131 @@ class DefineConstant(object):
 
         return(newCommand)
 
-def handleDefineConstants(lines, define_cache = None):
+def handleDefineConstants(lines, define_cache = None, dont_search = True):
     defineRe = r"^define\s+%s\s*(?:\((?P<args>.+)\))?\s*:=(?P<val>.+)$" % variableNameRe
     defineAppendRe = r"^define\s+%s\s*(?:\((?P<args>.+)\))?\s*\+=(?P<val>.+)$" % variableNameRe
     definePrependRe = r"^define\s+%s\s*(?:\((?P<args>.+)\))?\s*=\+(?P<val>.+)$" % variableNameRe
 
-    if define_cache is not None:
+    if define_cache and dont_search:
         defineConstants = define_cache
 
         for l in lines:
             for dc in defineConstants:
                 l.command = dc.substituteValue(l.command, defineConstants, l)
     else:
-        defineConstants = collections.deque()
+        if not define_cache:
+            mode = 'FIND_NODES'
+            defineConstants = collections.deque()
+            node_assemble_groups = ['IVLS_ALL_NODES']
+        else:
+            mode = 'NORMAL_DEFINES'
+            defineConstants = define_cache
+            node_assemble_groups = []
 
-        newLines = collections.deque()
-        defineNames = set()
+        found_defines = []
 
         # Scan through all the lines to find define declarations.
-        for l in lines:
-            command = l.command.strip()
+        first_run = True
+        while (first_run or node_assemble_groups is not None):
+            rerun = False
+            newLines = collections.deque()
 
-            if not command.startswith("define"):
-                newLines.append(l)
+            if mode == 'NORMAL_DEFINES' and not first_run:
+                node_assemble_groups = None
+
+            for l in lines:
+                command = l.command.strip()
+
+                if not command.startswith("define"):
+                    newLines.append(l)
+                    continue
+
+                define_type = 'none'
+                m = re.search(defineRe, command)
+                if m:
+                    define_type = 'new'
+
+                if define_type == 'none':
+                    m = re.search(defineAppendRe, command)
+                    if m:
+                        define_type = 'append'
+
+                if define_type == 'none':
+                    m = re.search(definePrependRe, command)
+                    if m:
+                        define_type = 'prepend'
+
+                if define_type == 'none':
+                    newLines.append(l)
+                    continue
+
+                found_defines.append(m.group("name"))
+                if first_run:
+                    newLines.append(l)
+                    continue
+
+                if (node_assemble_groups and not (m.group("name") in node_assemble_groups)):
+                    newLines.append(l)
+                    continue
+
+                # count how many literals we have
+                num_literals = m.group("val").count(",") + 1
+
+                if num_literals > 1:
+                    # add define for amount of entries in a literal define (.SIZE suffix)
+                    defineSizeObj = DefineConstant(m.group("whole") + '.SIZE', str(num_literals), None, l)
+                    defineConstants.append(defineSizeObj)
+
+                # Create define and evaluate if legitimate
+                defineObj = None
+                existing = list(filter(lambda d: d.name == m.group("name"), defineConstants))
+
+                if define_type == 'append' and len(existing) > 0:
+                    # If appending to existing, remove existing and concatente
+                    defineObj = DefineConstant(m.group("whole"), existing[0].value + ', ' + m.group("val").strip(), m.group("args"), l)
+                    defineConstants.remove(existing[0])
+                elif define_type == 'prepend' and len(existing) > 0:
+                    # If appending to existing, remove existing and concatente
+                    defineObj = DefineConstant(m.group("whole"), m.group("val").strip() + ', ' + existing[0].value, m.group("args"), l)
+                    defineConstants.remove(existing[0])
+                elif define_type == 'new' and len(existing) > 0:
+                    # If new and exists already, raise Exception
+                    if existing[0].value != m.group("val").strip():
+                        raise ParseException(l, "Define constant was already declared!")
+                else:
+                    # All other cases, create a new define
+                    defineObj = DefineConstant(m.group("whole"), m.group("val").strip(), m.group("args"), l)
+
+                if defineObj:
+                    defineConstants.append(defineObj)
+                    if node_assemble_groups:
+                        node_assemble_groups.extend([n for n in utils.split_args(m.group("val"), 0) if n in found_defines])
+                        rerun = True
+
+            if first_run:
+                first_run = False
                 continue
 
-            define_type = 'none'
-            m = re.search(defineRe, command)
-            if m:
-                define_type = 'new'
+            if defineConstants:
+                # Replace all occurences where other defines are used in define values - do it a few times to catch some deeper nested defines.
+                if define_cache is None or node_assemble_groups or mode == 'NORMAL_DEFINES':
+                    for n in range(0, 3):
+                        for dc_i in defineConstants:
+                            for dc_j in defineConstants:
+                                dc_i.setValue(dc_j.substituteValue(dc_i.getValue(), defineConstants))
 
-            if define_type == 'none':
-                m = re.search(defineAppendRe, command)
-                if m:
-                    define_type = 'append'
+                            dc_i.evaluateValue()
 
-            if define_type == 'none':
-                m = re.search(definePrependRe, command)
-                if m:
-                    define_type = 'prepend'
+                for l in newLines:
+                    for dc in defineConstants:
+                        l.command = dc.substituteValue(l.command, defineConstants, l)
 
-            if define_type == 'none':
-                newLines.append(l)
+            replaceLines(lines, newLines)
+            
+            if rerun:
                 continue
-
-            # count how many literals we have
-            num_literals = m.group("val").count(",") + 1
-
-            if num_literals > 1:
-                # add define for amount of entries in a literal define (.SIZE suffix)
-                defineSizeObj = DefineConstant(m.group("whole") + '.SIZE', str(num_literals), None, l)
-                defineConstants.append(defineSizeObj)
-
-            # Create define and evaluate if legitimate
-            defineObj = None
-            existing = list(filter(lambda d: d.name == m.group("name"), defineConstants))\
-
-            if define_type == 'append' and len(existing) > 0:
-                # If appending to existing, remove existing and concatente
-                defineObj = DefineConstant(m.group("whole"), existing[0].value + ', ' + m.group("val").strip(), m.group("args"), l)
-                defineConstants.remove(existing[0])
-            elif define_type == 'prepend' and len(existing) > 0:
-                # If appending to existing, remove existing and concatente
-                defineObj = DefineConstant(m.group("whole"), m.group("val").strip() + ', ' + existing[0].value, m.group("args"), l)
-                defineConstants.remove(existing[0])
-            elif define_type == 'new' and len(existing) > 0:
-                # If new and exists already, raise Exception
-                if existing[0].value != m.group("val").strip():
-                    raise ParseException(l, "Define constant was already declared!")
             else:
-                # All other cases, create a new define
-                defineObj = DefineConstant(m.group("whole"), m.group("val").strip(), m.group("args"), l)
-
-            if defineObj:
-                defineConstants.append(defineObj)
-
-        if defineConstants:
-            # Replace all occurences where other defines are used in define values - do it a few times to catch some deeper nested defines.
-            if define_cache is None:
-                for n in range(0, 3):
-                    for dc_i in defineConstants:
-                        for dc_j in defineConstants:
-                            dc_i.setValue(dc_j.substituteValue(dc_i.getValue(), defineConstants))
-
-                        dc_i.evaluateValue()
-
-            for l in newLines:
-                for dc in defineConstants:
-                    l.command = dc.substituteValue(l.command, defineConstants, l)
-
-        replaceLines(lines, newLines)
+                node_assemble_groups = None
 
     return defineConstants
 
