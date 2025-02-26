@@ -61,8 +61,9 @@ def pre_macro_functions(lines, define_cache = None):
     ''' This function is called before the macros have been expanded.
         Returns the resulting define objects as a cache to be re-used.
         lines is a deque of Line objects - see ksp_compiler.py.'''
-    if not define_cache:
+    if define_cache is None:
         createBuiltinDefines(lines)
+
     return substituteDefines(lines, define_cache, False)
 
 def macro_iter_functions(lines, placeholders=placeholders):
@@ -1633,14 +1634,14 @@ def handleDefineConstants(lines, define_cache = None, dont_search = True):
     defineAppendRe = r"^define\s+%s\s*(?:\((?P<args>.+)\))?\s*\+=(?P<val>.+)$" % variableNameRe
     definePrependRe = r"^define\s+%s\s*(?:\((?P<args>.+)\))?\s*=\+(?P<val>.+)$" % variableNameRe
 
-    if define_cache and dont_search:
+    if define_cache is not None and dont_search:
         defineConstants = define_cache
 
         for l in lines:
             for dc in defineConstants:
                 l.command = dc.substituteValue(l.command, defineConstants, l)
     else:
-        if not define_cache:
+        if define_cache is None:
             mode = 'FIND_NODES'
             defineConstants = collections.deque()
             node_assemble_groups = ['IVLS_ALL_NODES']
@@ -1733,7 +1734,7 @@ def handleDefineConstants(lines, define_cache = None, dont_search = True):
                 first_run = False
                 continue
 
-            if defineConstants:
+            if defineConstants is not None:
                 # Replace all occurences where other defines are used in define values - do it a few times to catch some deeper nested defines.
                 if define_cache is None or node_assemble_groups or mode == 'NORMAL_DEFINES':
                     for n in range(0, 3):
