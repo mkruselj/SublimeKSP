@@ -286,6 +286,9 @@ def parse_node_macros(code_lines, define_cache):
             inheritance_map[child_node] = (base_node, dict(zip(base_args, args)))
 
     for child_node, (base_node, arg_dict) in inheritance_map.items():
+        node_offs[child_node] = False
+        node_passes[child_node] = False
+
         if base_node in node_offs:
             node_offs[child_node] = node_offs[base_node]
 
