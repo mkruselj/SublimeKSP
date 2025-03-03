@@ -1241,14 +1241,16 @@ class ASTModifierNodesToNativeKSP(ASTModifierBase):
                     node.variable.prefix = '?'
                 else:
                     if node.initial_value is not None:
+                        try:
+                            expr_eval = comp_extras.evaluate_expression(node.initial_value[0])
 
-                        expr_eval = comp_extras.evaluate_expression(node.initial_value[0])
-
-                        if isinstance(expr_eval, str):
-                            node.variable.prefix = '!'
-                        elif isinstance(expr_eval, Decimal):
-                            node.variable.prefix = '?'
-                        else:
+                            if isinstance(expr_eval, str):
+                                node.variable.prefix = '!'
+                            elif isinstance(expr_eval, Decimal):
+                                node.variable.prefix = '?'
+                            else:
+                                node.variable.prefix = '%'
+                        except:
                             node.variable.prefix = '%'
                     else:
                         node.variable.prefix = '%'
