@@ -2582,7 +2582,7 @@ class KSPCompiler(object):
                     callback(desc, 100 * time_so_far / total_time) # parameters are: description, percent done
 
                 if self.basedir:
-                    with open(os.path.join(self.basedir, '__compile_fail_log.ksp'), 'w') as out:
+                    with open(os.path.join(self.basedir, '__compile_fail.log'), 'w') as out:
                         for l in self.lines:
                             out.write(l.command + '\n')
                 func()
