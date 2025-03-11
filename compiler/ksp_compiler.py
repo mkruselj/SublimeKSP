@@ -430,7 +430,7 @@ def parse_lines(s, filename = None, namespaces = None):
     if namespaces is None:
         namespaces = []
 
-    s = handlePython(s)    
+    s = handlePython(s)
 
     lines = s.replace('\r\n', '\n').replace('\r', '\n').split('\n')
     lines = [process_f_string(l) for l in lines]
@@ -444,7 +444,7 @@ def parse_lines(s, filename = None, namespaces = None):
     s = comment_re.sub('', s)
 
     lines = s.split('\n')
-    
+
 
     # NOTE(Sam): Remove any occurances of the new comment type //
     for i in range(len(lines)):
@@ -472,9 +472,10 @@ def handlePython(code):
     # Use re.DOTALL to make '.' match newlines
     run_re = re.compile(r"run\s*<<(?P<code>.+?)>>", re.DOTALL)
     read_re = re.compile(r"read\s*<<(?P<code>.+?)>>", re.DOTALL)
-    
-    namespace = {'__builtins__': __builtins__, **globals()}
-    
+
+    namespace = {'__builtins__': __builtins__}
+    namespace.update(globals())
+
     import textwrap
     def trimmed(s: str) -> str:
         """
@@ -496,24 +497,24 @@ def handlePython(code):
 
             finished = False
             break
-        
+
         # Then process all read<< >> blocks
         for m in read_re.finditer(new_code):  # Process in reverse to maintain indices
             eval_code = trimmed(m.group('code'))
             final = eval(eval_code, namespace)
-            
+
             if isinstance(final, int):
                 final = str(final)
             elif isinstance(final, list):
                 final = '\n'.join(final)
             else:
                 final = str(final)
-                
+
             new_code = new_code[:m.start()] + final + new_code[m.end():]
 
             finished = False
             break
-    
+
     return new_code
 
 def convert_strings_to_placeholders(lines):
@@ -2125,6 +2126,7 @@ def open_nckp(lines, basedir):
 
                         if not ui_to_import:
                             utils.log_message("Note: No UI control declarations were found in %s!" % os.path.abspath(nckp_path))
+                            strip_import_nckp_function_from_source(lines)
 
                         for i, v in enumerate(ui_to_import):
                             variables.add(v.lower())
@@ -2288,9 +2290,9 @@ class KSPCompiler(object):
     def ivls_node_assemble(self):
         from ivls import ivls_node_assemble
         from preprocessor_plugins import substituteDefines
-        
+
         self.lines = ivls_node_assemble(self.lines, self.define_cache)
-        
+
         convert_strings_to_placeholders(self.lines)
         self.define_cache = substituteDefines(self.lines, self.define_cache)
 
