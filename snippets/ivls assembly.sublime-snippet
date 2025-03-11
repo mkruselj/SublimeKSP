@@ -1,15 +1,23 @@
 <snippet>
     <content><![CDATA[
-define IVLS_NODES += ${1:Product}.Startup
+// ------------------------- Product Nodes ----------------------------
+
 node ${1:Product}.Startup:
+    cb ICB:
+        // import_nckp(file_path)
+        // load_performance_view(file_name)
+
     cb PCCB:
-        ui.set_display("${1:Product} v0.1, compiled on " & __LOCALE_MONTH_ABBR__ & " " & __DAY__ & ", " & __YEAR__ & " at " & __LOCALE_TIME__)
+        ui.set_display(f'${1:Product} v0.1, compiled on <__LOCALE_MONTH_ABBR__> <__DAY__>, <__YEAR__> at <__LOCALE_TIME__>')
+
+    cb Functions:
+        define PRODUCT_GUI_HEIGHT := 300
+        function ui.hooks.add_display_footer() -> bool
+            bool := TRUE
+        end function
 
 end node
 
-// ------------------------- Product Nodes ----------------------------
-
-define IVLS_NODES += ${1:Product}.PlaybackLogic
 node ${1:Product}.PlaybackLogic:
     cb Keymaps:
         define KEYMAPS += product_main
@@ -25,7 +33,6 @@ node ${1:Product}.PlaybackLogic:
 
 end node
 
-define IVLS_NODES += ${1:Product}.PlayEvent
 node ${1:Product}.PlayEvent from Stl.PlayEvent.Template:
     cb EventArgs:
         // event.note :=
@@ -38,30 +45,14 @@ node ${1:Product}.PlayEvent from Stl.PlayEvent.Template:
         
 end node
 
-define IVLS_NODES += ${1:Product}.StlHooks
-node ${1:Product}.StlHooks:
-    cb Functions:
-        function ivls.RoundRobins.hooks.get_max_rr(vo) -> rr_max
-            rr_max := 0
-        end function
- end node
-
-
 // -------------------------IVLS System Creation-------------------------------
 
 define ivls.THREADS := 4
-define ivls.STL_OPTION := Stl.Full
-
-define Voice.MEMBERS := Voice.STL_MEMBERS
-define Voice.INIT_LIST := Voice.STL_INIT
-
-define PRODUCT_GUI_HEIGHT := 300
-function ui.hooks.add_display_footer() -> bool
-    bool := TRUE
-end function
+define IVLS_NODES := ${1:Product}.Startup, ...
+                     ${1:Product}.PlaybackLogic, ...
+                     ${1:Product}.PlayEvent
 
 import '_IVLS/builder.ksp'
-
 { #pragma save_compiled_source ../Resources/scripts/ivls-compiled.txt }
 ]]></content>
     <description>callback</description>
