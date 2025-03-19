@@ -55,6 +55,11 @@
     ],
     "themes": [
       {
+        "label": "SublimeKSP Dark VS",
+        "path": "./vscode/themes/sksp-dark-vs-color-theme.json",
+        "uiTheme": "vs-dark"
+      },
+      {
         "label": "SublimeKSP Dark",
         "path": "./vscode/themes/sksp-dark-color-theme.json",
         "uiTheme": "vs-dark"
