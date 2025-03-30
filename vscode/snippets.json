@@ -203,6 +203,12 @@
 		"description": "pragma compile with compact variables",
 		"scope": "source.sksp"
 	},
+	"pwb": {
+		"prefix": "pwb",
+		"body": "{ #pragma compile_with extra_branch_optimization }",
+		"description": "pragma compile with additional branch optimization",
+		"scope": "source.ksp"
+	},
 	"pwe": {
 		"prefix": "pwe",
 		"body": "{ #pragma compile_with extra_syntax_checks }",
@@ -227,6 +233,12 @@
 		"description": "pragma compile with sanitize exit",
 		"scope": "source.sksp"
 	},
+	"pwl": {
+		"prefix": "pwl",
+		"body": "{ #pragma compile_with write_log_on_fail }",
+		"description": "pragma compile with write log on fail",
+		"scope": "source.ksp"
+	},
 	"poa": {
 		"prefix": "poa",
 		"body": "{ #pragma compile_without add_compile_date }",
@@ -244,6 +256,12 @@
 		"body": "{ #pragma compile_without compact_variables }",
 		"description": "pragma compile without compact variables",
 		"scope": "source.sksp"
+	},
+	"pob": {
+		"prefix": "pob",
+		"body": "{ #pragma compile_without extra_branch_optimization }",
+		"description": "pragma compile without additional branch optimization",
+		"scope": "source.ksp"
 	},
 	"poe": {
 		"prefix": "poe",
@@ -268,6 +286,12 @@
 		"body": "{ #pragma compile_without sanitize_exit_command }",
 		"description": "pragma compile without sanitize exit",
 		"scope": "source.sksp"
+	},
+	"pol": {
+		"prefix": "pol",
+		"body": "{ #pragma compile_without write_log_on_fail }",
+		"description": "pragma compile without write log on fail",
+		"scope": "source.ksp"
 	},
 	"ppn": {
 		"prefix": "ppn",
