@@ -15,6 +15,20 @@
              "context": [{ "key": "selector", "operator": "equal", "operand": "source.sksp" }]
         },
         {
+            "keys": ["alt+f5"],
+            "command" : "compile_ksp_cli",
+            "context": [{ "key": "selector", "operator": "equal", "operand": "source.sksp" }]
+        },
+        {
+            "keys": ["ctrl+alt+f5"],
+            "command" : "compile_ksp_cli",
+            "args":
+            {
+                "recompile": true
+            },
+            "context": [{ "key": "selector", "operator": "equal", "operand": "source.sksp" }]
+        },
+        {
             "keys": ["alt+c"],
             "command": "numeric_sequence",
             "context": [{ "key": "selector", "operator": "equal", "operand": "source.sksp" }]

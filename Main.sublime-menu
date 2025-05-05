@@ -59,6 +59,34 @@
 					{"caption": "-"}, //separator
 
 					{
+						"command": "compile_ksp_cli",
+						"context":
+						[{
+							"key": "selector",
+							"operator": "equal",
+							"operand": "source.sksp"
+						}],
+						"mnemonic": "m",
+						"caption": "Compile Via Terminal",
+						"id": "compile_ksp_cli"
+					},
+					{
+						"command": "compile_ksp_cli",
+						"args": { "recompile": true },
+						"context":
+						[{
+							"key": "selector",
+							"operator": "equal",
+							"operand": "source.sksp"
+						}],
+						"mnemonic": "R",
+						"caption": "Recompile Last Script Via Terminal",
+						"id": "recompile_ksp_cli"
+					},
+
+					{"caption": "-"}, //separator
+
+					{
 						"command": "ksp_global_setting_toggle",
 						"args": {"setting": "ksp_play_sound", "default": false},
 						"caption": "Play Sound When Compilation Finishes",

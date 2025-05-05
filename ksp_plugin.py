@@ -1,10 +1,12 @@
 import sublime
 import sublime_plugin
 
+import newterm
 import traceback
 import io
 import os
 import re
+import subprocess
 import sys
 import threading
 import urllib, tarfile, json, shutil
@@ -12,7 +14,6 @@ import webbrowser
 import xml.etree.ElementTree as ET
 
 from datetime import datetime
-from subprocess import call
 
 try:
     import winsound
@@ -58,29 +59,35 @@ class CompileKspCliCommand(sublime_plugin.ApplicationCommand):
         # path to compiler
         path = os.path.join(sublime.packages_path(), 'KSP (Kontakt Script Processor)', 'compiler', 'ksp_compiler.py')
 
-        if path:
-            fn = ''
-
-            if kwargs.get('recompile', None) and self.last_filename:
-                fn = self.last_filename
-            else:
-                # find the view containing the code to compile
-                view = sublime.active_window().active_view()
-                fn = view.file_name()
-
-            if fn:
-                print(fn)
-                if os.path.splitext(fn)[1] in all_exts:
-                    subprocess.Popen(['python', '-i', path, fn])
-
-                    self.last_filename = fn
-                else:
-                    utils.log_message('Attempted compilation of an unsupported file type! Make sure the extension is .ksp, .txt or .log and that syntax is set to KSP!')
-            else:
-                utils.log_message('Current tab in Sublime Text is not a file which exists on disk. Save the code to disk before compiling via command line!')
-        else:
+        if not path:
             utils.log_message('The available SublimeKSP package is installed via Package Control. Compiling via command line requires an unmanaged (manual) installation!')
+            return
 
+        input_file = self.last_filename if kwargs.get('recompile', None) else None
+
+        if not input_file:
+            # find the view containing the code to compile
+            input_file = sublime.active_window().active_view().file_name()
+
+        if not input_file:
+            utils.log_message('Current tab in Sublime Text is not a file which exists on disk. Save the code to disk before compiling via command line!')
+            return
+
+        if not (os.path.splitext(input_file)[1] in all_exts):
+            utils.log_message('Attempted compilation of an unsupported file type! Make sure the extension is .ksp, .txt or .log and that syntax is set to KSP!')
+            return
+
+        newterm.launch_terminal(cwd = os.path.dirname(input_file),
+                                terminal = 'python3' if sublime.platform() == 'osx' else 'python',
+                                args = ['-i', path, input_file])
+
+        self.last_filename = input_file
+
+    def is_visible(self):
+        # path to compiler
+        path = os.path.join(sublime.packages_path(), 'KSP (Kontakt Script Processor)', 'compiler', 'ksp_compiler.py')
+
+        return os.path.exists(path)
 
 class CompileKspCommand(sublime_plugin.ApplicationCommand):
     '''Compile the KSP file or files'''
@@ -161,10 +168,10 @@ class GetSound:
                 winsound.PlaySound(sound_path, winsound.SND_FILENAME | winsound.SND_ASYNC | winsound.SND_NODEFAULT)
         elif sublime.platform() == "osx":
             if os.path.isfile(sound_path):
-                call(["afplay", "-v", str(1), sound_path])
+                subprocess.call(["afplay", "-v", str(1), sound_path])
         else:
             if os.path.isfile(sound_path):
-                call(["aplay", sound_path])
+                subprocess.call(["aplay", sound_path])
 
 
 class CompileKspThread(threading.Thread):

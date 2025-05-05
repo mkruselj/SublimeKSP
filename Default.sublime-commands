@@ -17,6 +17,19 @@
 	},
 
 	{
+		"caption": "SublimeKSP: Compile Via Terminal",
+		"command": "compile_ksp_cli"
+	},
+	{
+		"caption": "SublimeKSP: Recompile Via Terminal",
+		"command": "compile_ksp_cli",
+		"args":
+		{
+			"recompile": true
+		}
+	},
+
+	{
 		"caption": "SublimeKSP: Play Sound When Compilation Finishes",
 		"command": "ksp_global_setting_toggle",
 		"args":
