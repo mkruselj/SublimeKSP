@@ -153,8 +153,10 @@
         },
         {
             "comment": "Single-quoted string",
-            "name": "string.quoted.single.source.sksp",
-            "match": "(?:f)?'(?:[^'\\\\]|\\\\.)*'"
+            "match": "(f)?('(?:[^'\\\\]|\\\\.)*')",
+            "captures": {
+                "1": {"name": "keyword.source.sksp" },
+                "2": {"name": "string.quoted.single.source.sksp" } }
         },
         {
             "comment": "Identifier",
