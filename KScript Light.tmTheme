@@ -216,6 +216,19 @@
                 <string>#007F00</string>
             </dict>
         </dict>
+        <dict>
+            <key>name</key>
+            <string>Invalid Syntax</string>
+            <key>scope</key>
+            <string>invalid.illegal</string>
+            <key>settings</key>
+            <dict>
+                <key>fontStyle</key>
+                <string>bold italic</string>
+                <key>foreground</key>
+                <string>#f00</string>
+            </dict>
+        </dict>
     </array>
 </dict>
 </plist>

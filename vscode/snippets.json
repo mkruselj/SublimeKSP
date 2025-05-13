@@ -207,7 +207,7 @@
 		"prefix": "pwb",
 		"body": "{ #pragma compile_with extra_branch_optimization }",
 		"description": "pragma compile with additional branch optimization",
-		"scope": "source.ksp"
+		"scope": "source.sksp"
 	},
 	"pwe": {
 		"prefix": "pwe",
@@ -237,7 +237,7 @@
 		"prefix": "pwl",
 		"body": "{ #pragma compile_with write_log_on_fail }",
 		"description": "pragma compile with write log on fail",
-		"scope": "source.ksp"
+		"scope": "source.sksp"
 	},
 	"poa": {
 		"prefix": "poa",
@@ -261,7 +261,7 @@
 		"prefix": "pob",
 		"body": "{ #pragma compile_without extra_branch_optimization }",
 		"description": "pragma compile without additional branch optimization",
-		"scope": "source.ksp"
+		"scope": "source.sksp"
 	},
 	"poe": {
 		"prefix": "poe",
@@ -291,7 +291,7 @@
 		"prefix": "pol",
 		"body": "{ #pragma compile_without write_log_on_fail }",
 		"description": "pragma compile without write log on fail",
-		"scope": "source.ksp"
+		"scope": "source.sksp"
 	},
 	"ppn": {
 		"prefix": "ppn",
