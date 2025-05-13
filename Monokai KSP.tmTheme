@@ -218,13 +218,15 @@
         </dict>
         <dict>
             <key>name</key>
-            <string>Parentheses</string>
+            <string>Invalid Syntax</string>
             <key>scope</key>
-            <string>parentheses -begin.source.sksp -end.source.sksp</string>
+            <string>invalid.illegal</string>
             <key>settings</key>
             <dict>
+                <key>fontStyle</key>
+                <string>bold italic</string>
                 <key>foreground</key>
-                <string>#E3E3E3</string>
+                <string>#f00</string>
             </dict>
         </dict>
     </array>
