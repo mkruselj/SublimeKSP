@@ -51,6 +51,7 @@ Building and modifying the extension locally is fairly straightforward. For Subl
 * If adding new built-in data (for example, new engine parameters or new functions introduced to KSP), make sure to run the `update-builtins.py` script from `dev/` folder!
 * When adding new snippets, make sure there is _no_ newline after the `CDATA[` part, as this would misbehave in VS Code (Sublime Text disregards this potential extra newline, VS Code does not)
 * To build the VSIX extension, simply run `build-vsix.sh` from Bash shell or `build-vsix.bat` from Windows command line
+* To check out your changes, execute `code --install-extension <filename-of-vsix>` (assuming your terminal is pointing at the root of the repository folder), then run `Developer: Reload Window` command
 
 ### Compiling From The Command Line
 
