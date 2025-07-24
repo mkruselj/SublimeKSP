@@ -1,6 +1,6 @@
 # SublimeKSP
 
-A Sublime Text (versions 3 and 4) plugin for working with and compiling KSP (Kontakt Script Processor) code.
+A Sublime Text (versions 3 and 4) and VS Code plugin for working with and compiling KSP (Kontakt Script Processor) code.
 
 ### Changes
 This fork is based on [Nils Liberg's official SublimeKSP plugin, v1.11](http://nilsliberg.se/ksp/), and supports all Kontakt versions.
@@ -22,7 +22,7 @@ However, there are a number of additions and changes:
   * Press <kbd>Enter</kbd> to install
   * Restart Sublime Text
 
-### Installation (Visual Studio Code)
+### Installation (VS Code)
 
 * Click the Extensions tab
 * Type "SublimeKSP" in the search bar
