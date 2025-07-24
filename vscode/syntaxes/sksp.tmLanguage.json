@@ -136,10 +136,11 @@
         },
         {
             "comment": "Function call",
-            "match": "^\\s*(call\\s+)?([\\w#.]+)\\s*(?:\\()",
+            "match": "\\b(((call)\\s+([\\w#.]+))|([\\w#.]+)\\s*(?:\\())",
             "captures": {
-                "1": { "name": "keyword.source.sksp" },
-                "2": { "name": "meta.function-call.source.sksp" } }
+                "3": { "name": "keyword.source.sksp" },
+                "4": { "name": "meta.function-call.source.sksp" } ,
+                "5": { "name": "meta.function-call.source.sksp" } }
         },
         {
             "comment": "Keywords",
